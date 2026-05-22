@@ -28,7 +28,34 @@ if (isset($_GET['id'])) {
         $foto_utama = !empty($row['foto']) ? htmlspecialchars($row['foto']) : 'no-image.jpg';
 ?>
 
-        <div class="row">
+        <style>
+            /* CSS untuk efek hover zoom pada gambar */
+            .zoomable-img {
+                cursor: zoom-in;
+                transition: transform 0.3s ease;
+            }
+
+            .zoomable-img:hover {
+                transform: scale(1.02);
+            }
+
+            /* Custom Lightbox Fullscreen */
+            #customLightbox {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.85);
+                z-index: 9999;
+                justify-content: center;
+                align-items: center;
+                backdrop-filter: blur(5px);
+            }
+        </style>
+
+        <div class="row align-items-center">
             <div class="col-md-5 mb-3 mb-md-0 text-center position-relative">
                 <?php if ($has_promo): ?>
                     <div class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
@@ -51,16 +78,22 @@ if (isset($_GET['id'])) {
                         ?>
                                 <div class="carousel-item <?php echo $active; ?>">
                                     <img src="assets/img/<?php echo htmlspecialchars($foto['nama_file']); ?>"
-                                        class="d-block w-100"
+                                        class="d-block w-100 zoomable-img"
                                         alt="<?php echo htmlspecialchars($row['nama_produk']); ?>"
-                                        style="height: 380px; width: 100%; object-fit: contain; background-color: #f8f9fa;">
+                                        style="height: 380px; width: 100%; object-fit: contain; background-color: #f8f9fa;"
+                                        onclick="openLightbox(this.src)">
                                 </div>
                         <?php
                                 $i++;
                             }
                         } else {
                             // Jika tidak ada data di tabel produk_foto, tampilkan gambar default
-                            echo '<div class="carousel-item active"><img src="assets/img/no-image.jpg" class="d-block w-100" style="height: 380px; object-fit: cover;"></div>';
+                            echo '<div class="carousel-item active">
+                                    <img src="assets/img/no-image.jpg" 
+                                         class="d-block w-100 zoomable-img" 
+                                         style="height: 380px; object-fit: cover;"
+                                         onclick="openLightbox(this.src)">
+                                  </div>';
                         }
                         ?>
                     </div>
@@ -138,10 +171,30 @@ if (isset($_GET['id'])) {
                     </div>
                 </div>
             </div>
+        </div>
 
-    <?php
+        <div id="customLightbox" onclick="closeLightbox()">
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" style="z-index: 10000; padding: 15px;"></button>
+            <img id="lightboxImg" src="" style="max-height: 90vh; max-width: 90vw; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 8px;">
+        </div>
+
+        <script>
+            // Fungsi untuk membuka Lightbox
+            function openLightbox(src) {
+                document.getElementById('lightboxImg').src = src;
+                document.getElementById('customLightbox').style.display = 'flex';
+            }
+
+            // Fungsi untuk menutup Lightbox
+            function closeLightbox() {
+                document.getElementById('customLightbox').style.display = 'none';
+                document.getElementById('lightboxImg').src = '';
+            }
+        </script>
+
+<?php
     } else {
         echo "<div class='text-center py-4 text-danger'><i class='bi bi-exclamation-triangle display-4'></i><p class='mt-2'>Data detail produk gagal dimuat.</p></div>";
     }
 }
-    ?>
+?>

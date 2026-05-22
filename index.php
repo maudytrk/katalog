@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+$today = date('Y-m-d');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -140,6 +141,137 @@ include 'koneksi.php';
         </div>
     </div>
 
+    <?php if (empty($_GET['search'])): ?>
+
+        <section class="py-4 bg-transparent mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row align-items-center shadow-sm rounded-4 p-4 p-md-5" style="background-color: white; border: 1px solid var(--bg-lavender);">
+                    <div class="col-lg-7 mb-4 mb-lg-0">
+                        <span class="badge px-3 py-2 rounded-pill mb-3" style="background-color: var(--accent-plum); color: white;">Tentang Kami</span>
+                        <h2 class="fw-bold mb-3" style="color: var(--accent-indigo);">PT Rahayu Karunia Utama</h2>
+                        <p class="text-muted mb-4" style="line-height: 1.8;">Kami adalah produsen perlengkapan inner wanita berkualitas yang telah berdiri sejak tahun 2011. Dengan dedikasi tinggi, kami memproduksi ciput, manset, dan legging yang mengedepankan kenyamanan, kerapihan, dan estetika. Produk kami dijahit langsung oleh pengrajin lokal berpengalaman untuk menemani aktivitas harian Anda.</p>
+                        <a href="katalog.php" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Jelajahi Koleksi</a>
+                    </div>
+                    <div class="col-lg-5 text-center">
+                        <img src="assets/img/logorahayu.png" alt="PT Rahayu" class="img-fluid rounded" style="max-height: 200px; object-fit: contain;">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <?php
+        $promo_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+                        FROM produk p 
+                        LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                        JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
+                        WHERE pr.diskon_persen > 0
+                        ORDER BY p.id_produk DESC LIMIT 4";
+        $promo_result = $koneksi->query($promo_query);
+
+        if ($promo_result && $promo_result->num_rows > 0):
+        ?>
+            <section class="py-5" style="background-color: rgba(108, 71, 115, 0.04);">
+                <div class="container px-4 px-lg-5">
+                    <div class="d-flex justify-content-between align-items-end mb-4">
+                        <div>
+                            <h3 class="fw-bold m-0" style="color: var(--accent-plum);"><i class="bi bi-tags-fill text-danger me-2"></i>Promo Spesial</h3>
+                            <div class="mt-2" style="width: 60px; height: 4px; background-color: var(--accent-indigo); border-radius: 5px;"></div>
+                        </div>
+                        <a href="katalog_promo.php" class="text-decoration-none fw-bold" style="color: var(--accent-indigo);">Lihat Semua Promo <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                        <?php while ($p_row = $promo_result->fetch_assoc()):
+                            $harga_akhir = $p_row['harga'] - ($p_row['harga'] * ($p_row['diskon_persen'] / 100));
+                        ?>
+                            <div class="col mb-5">
+                                <div class="card h-100 product-card position-relative border-0 shadow-sm">
+                                    <div class="position-absolute top-0 end-0 m-2" style="z-index: 2;">
+                                        <span class="badge bg-danger text-white fw-bold px-2 py-1 rounded shadow-sm">-<?php echo $p_row['diskon_persen']; ?>%</span>
+                                    </div>
+                                    <div style="overflow: hidden; height: 220px; background-color: var(--bg-lavender);">
+                                        <img class="card-img-top w-100 h-100" style="object-fit: cover;" src="assets/img/<?php echo !empty($p_row['foto']) ? htmlspecialchars($p_row['foto']) : 'no-image.jpg'; ?>" alt="Foto Produk" />
+                                    </div>
+                                    <div class="card-body p-3 text-center d-flex flex-column">
+                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                        <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
+                                        <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
+                                            <span class="text-muted text-decoration-line-through small d-block">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
+                                            <span class="fw-bold fs-6" style="color: #D32F2F;">Rp <?php echo number_format($harga_akhir, 0, ',', '.'); ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                        <button class="btn btn-outline-primary btn-sm w-100 rounded-pill btn-lihat-detail py-2" data-id="<?php echo $p_row['id_produk']; ?>">Lihat Spesifikasi</button>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <?php
+        $terbaru_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+                          FROM produk p 
+                          LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                          LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
+                          ORDER BY p.id_produk DESC LIMIT 4";
+        $terbaru_result = $koneksi->query($terbaru_query);
+
+        if ($terbaru_result && $terbaru_result->num_rows > 0):
+        ?>
+            <section class="py-5 bg-white">
+                <div class="container px-4 px-lg-5">
+                    <div class="d-flex justify-content-between align-items-end mb-4">
+                        <div>
+                            <h3 class="fw-bold m-0" style="color: var(--accent-indigo);"><i class="bi bi-box-seam text-primary me-2"></i>Produk Terbaru</h3>
+                            <div class="mt-2" style="width: 60px; height: 4px; background-color: var(--accent-plum); border-radius: 5px;"></div>
+                        </div>
+                        <a href="katalog.php" class="text-decoration-none fw-bold" style="color: var(--accent-plum);">Lihat Katalog <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                        <?php while ($p_row = $terbaru_result->fetch_assoc()):
+                            $has_promo = isset($p_row['diskon_persen']) && $p_row['diskon_persen'] > 0;
+                        ?>
+                            <div class="col mb-5">
+                                <div class="card h-100 product-card position-relative border-0 shadow-sm">
+                                    <div class="position-absolute top-0 start-0 m-2" style="z-index: 2;">
+                                        <span class="badge shadow-sm small" style="background-color: rgba(36, 31, 72, 0.85); backdrop-filter: blur(5px);">Baru</span>
+                                    </div>
+                                    <?php if ($has_promo): ?>
+                                        <div class="position-absolute top-0 end-0 m-2" style="z-index: 2;">
+                                            <span class="badge bg-danger text-white fw-bold px-2 py-1 rounded shadow-sm">-<?php echo $p_row['diskon_persen']; ?>%</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div style="overflow: hidden; height: 220px; background-color: var(--bg-lavender);">
+                                        <img class="card-img-top w-100 h-100" style="object-fit: cover;" src="assets/img/<?php echo !empty($p_row['foto']) ? htmlspecialchars($p_row['foto']) : 'no-image.jpg'; ?>" alt="Foto Produk" />
+                                    </div>
+                                    <div class="card-body p-3 text-center d-flex flex-column">
+                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                        <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
+                                        <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
+                                            <?php if ($has_promo):
+                                                $harga_akhir = $p_row['harga'] - ($p_row['harga'] * ($p_row['diskon_persen'] / 100));
+                                            ?>
+                                                <span class="text-muted text-decoration-line-through small d-block">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
+                                                <span class="fw-bold fs-6" style="color: #D32F2F;">Rp <?php echo number_format($harga_akhir, 0, ',', '.'); ?></span>
+                                            <?php else: ?>
+                                                <span class="fw-bold fs-6" style="color: var(--accent-indigo);">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                        <button class="btn btn-outline-primary btn-sm w-100 rounded-pill btn-lihat-detail py-2" data-id="<?php echo $p_row['id_produk']; ?>">Lihat Spesifikasi</button>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+            </section>
+        <?php endif; ?>
+
+    <?php endif; ?>
     <section class="py-4 mb-5" id="populer">
         <div class="container px-4 px-lg-5">
             <div class="row mb-5 justify-content-center text-center">
@@ -154,8 +286,6 @@ include 'koneksi.php';
 
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-5 justify-content-center">
                 <?php
-                $today = date('Y-m-d');
-
                 if (isset($_GET['search']) && $_GET['search'] != '') {
                     $search = mysqli_real_escape_string($koneksi, $_GET['search']);
                     $populer_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
@@ -179,7 +309,7 @@ include 'koneksi.php';
                         $has_promo = isset($p_row['diskon_persen']) && $p_row['diskon_persen'] > 0;
                 ?>
                         <div class="col mb-5">
-                            <div class="card h-100 product-card position-relative">
+                            <div class="card h-100 product-card position-relative border-0 shadow-sm">
                                 <div class="position-absolute top-0 start-0 m-2" style="z-index: 2;">
                                     <span class="badge shadow-sm small" style="background-color: rgba(36, 31, 72, 0.85); backdrop-filter: blur(5px);">
                                         <i class="bi bi-eye-fill me-1"></i> <?php echo $p_row['jumlah_klik']; ?>
@@ -272,15 +402,17 @@ include 'koneksi.php';
         document.addEventListener("DOMContentLoaded", function() {
             // Logika Animasi Navbar saat Scroll
             const navbar = document.querySelector('.glass-navbar');
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-                    navbar.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
-                } else {
-                    navbar.style.background = 'rgba(224, 225, 246, 0.85)';
-                    navbar.style.boxShadow = 'none';
-                }
-            });
+            if (navbar) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 50) {
+                        navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                        navbar.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
+                    } else {
+                        navbar.style.background = 'rgba(224, 225, 246, 0.85)';
+                        navbar.style.boxShadow = 'none';
+                    }
+                });
+            }
 
             // Logika Load Detail Modal
             const modalDetail = new bootstrap.Modal(document.getElementById('modalDetailProduk'));
