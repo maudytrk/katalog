@@ -342,7 +342,7 @@ if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
                 <div id="contact" class="col-md-6 text-md-end">
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
-                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Jl. Raya Industri, Tasikmalaya<br>
+                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
                         <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
                         <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
                     </p>
