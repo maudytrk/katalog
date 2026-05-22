@@ -47,151 +47,201 @@ if ($res_chart) {
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 
     <style>
+        /* TEMA WARNA BERDASARKAN PALETTE E-CATALOGUE */
         :root {
-            --pastel-purple: #E0D2F0;
-            --soft-cream: #FCF8F1;
-            --olive-green: #7D8F37;
-            --dark-olive: #5A6926;
-            --text-dark: #4A4036;
+            --old-heliotrope: #6B4773;
+            --royal-fuchsia: #BB3F95;
+            --lavender-mist: #E0E1F6;
+            --space-cadet: #231F48;
+            --tyrian-purple: #560A39;
+            --bg-cream: #FCF8F1;
+
+            --accent-olive: #7D8F37;
+            --accent-olive-hover: #65752b;
         }
 
         body {
-            background-color: var(--soft-cream);
-            color: var(--text-dark);
+            background-color: var(--bg-cream);
+            color: var(--space-cadet);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Kustomisasi Top Navigation Bar */
-        .sb-topnav.navbar {
-            background-color: var(--pastel-purple) !important;
-            border-bottom: 2px solid var(--olive-green);
+        /* Navbar & Sidebar Custom */
+        .navbar-admin-custom {
+            background-color: var(--space-cadet) !important;
+            border-bottom: 3px solid var(--old-heliotrope);
         }
 
-        .sb-topnav .navbar-brand {
-            color: var(--text-dark) !important;
+        .navbar-admin-custom .navbar-brand {
+            color: #fff !important;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        .sb-topnav .nav-link,
-        .sb-topnav .btn-link {
-            color: var(--text-dark) !important;
-        }
-
-        .sb-topnav .nav-link:hover,
-        .sb-topnav .btn-link:hover {
-            color: var(--dark-olive) !important;
-        }
-
-        /* Kustomisasi Sidebar */
         .sb-sidenav-dark {
-            background-color: #373029 !important;
-            /* Cokelat gelap berbasis kontras tekstur kayu/earthy */
-            color: rgba(255, 255, 255, 0.75) !important;
+            background-color: #1a1736 !important;
+            /* Slightly darker Space Cadet */
+            color: rgba(255, 255, 255, 0.7) !important;
         }
 
         .sb-sidenav-dark .sb-sidenav-menu-heading {
-            color: var(--pastel-purple) !important;
+            color: var(--lavender-mist) !important;
             font-weight: 600;
-            opacity: 0.8;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .sb-sidenav-dark .nav-link {
             color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s;
         }
 
         .sb-sidenav-dark .nav-link .sb-nav-link-icon {
-            color: var(--pastel-purple) !important;
+            color: var(--lavender-mist) !important;
         }
 
         .sb-sidenav-dark .nav-link.active {
-            color: white !important;
-            background-color: var(--dark-olive) !important;
+            color: #fff !important;
+            background-color: var(--old-heliotrope) !important;
+            border-radius: 0 25px 25px 0;
+            margin-right: 15px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .sb-sidenav-dark .nav-link:hover {
-            color: white !important;
-            background-color: rgba(125, 143, 55, 0.3) !important;
+        .sb-sidenav-dark .nav-link:hover:not(.active) {
+            color: #fff !important;
+            background-color: rgba(107, 71, 115, 0.3) !important;
+            border-radius: 0 25px 25px 0;
+            margin-right: 15px;
         }
 
         .sb-sidenav-footer {
-            background-color: #2b2520 !important;
-            color: var(--pastel-purple) !important;
+            background-color: #121026 !important;
+            color: var(--lavender-mist) !important;
         }
 
-        /* Overriding Warna Utama Info Card Kontras Tinggi */
-        .bg-custom-produk {
-            background-color: var(--olive-green) !important;
-            color: #fff !important;
+        /* Kartu Ringkasan (Summary Cards) */
+        .summary-card {
+            background-color: #fff;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(35, 31, 72, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        .bg-custom-sales {
-            background-color: #5C6BC0 !important;
-            color: #fff !important;
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(35, 31, 72, 0.1);
         }
 
-        .bg-custom-promo {
-            background-color: #D9A05B !important;
-            color: #fff !important;
+        .summary-icon {
+            position: absolute;
+            right: -15px;
+            bottom: -15px;
+            font-size: 6rem;
+            opacity: 0.08;
+            z-index: -1;
+            transform: rotate(-10deg);
         }
 
-        .bg-custom-pesanan {
-            background-color: #C0392B !important;
-            color: #fff !important;
+        /* Border Kiri Kartu Berwarna */
+        .border-l-kategori {
+            border-left: 5px solid var(--accent-olive);
         }
 
-        .bg-custom-kategori {
-            background-color: #26A69A !important;
-            color: #fff !important;
+        .text-kategori {
+            color: var(--accent-olive);
         }
 
-        /* Fleksibilitas Kartu Bertema */
-        .bg-custom-produk,
-        .bg-custom-sales,
-        .bg-custom-promo,
-        .bg-custom-pesanan,
-        .bg-custom-kategori {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        .border-l-produk {
+            border-left: 5px solid var(--old-heliotrope);
         }
 
-        /* Penyesuaian khusus Warna Khusus Elemen Informasi */
-        .card {
-            border: 1px solid rgba(125, 143, 55, 0.15);
+        .text-produk {
+            color: var(--old-heliotrope);
         }
 
-        .card-header {
-            background-color: rgba(224, 210, 240, 0.4) !important;
-            color: var(--text-dark) !important;
-            font-weight: 600;
-            border-bottom: 1px solid rgba(125, 143, 55, 0.15);
+        .border-l-sales {
+            border-left: 5px solid var(--royal-fuchsia);
         }
 
-        /* Penyesuaian Footer Utama */
+        .text-sales {
+            color: var(--royal-fuchsia);
+        }
+
+        .border-l-promo {
+            border-left: 5px solid var(--tyrian-purple);
+        }
+
+        .text-promo {
+            color: var(--tyrian-purple);
+        }
+
+        .border-l-pesanan {
+            border-left: 5px solid var(--space-cadet);
+        }
+
+        .text-pesanan {
+            color: var(--space-cadet);
+        }
+
+        /* Panel Card Biasa (Grafik & Tabel) */
+        .panel-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(35, 31, 72, 0.04);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: var(--lavender-mist);
+            color: var(--space-cadet);
+            font-weight: 700;
+            border-bottom: 2px solid #DCD6EA;
+            padding: 15px 20px;
+        }
+
+        /* Kustomisasi Tabel & Badge */
+        .table>thead {
+            background-color: var(--space-cadet);
+            color: white;
+        }
+
+        .badge-status-pending {
+            background-color: #FFF3CD;
+            color: #856404;
+            border: 1px solid #FFEBAA;
+        }
+
+        .badge-status-selesai {
+            background-color: #D1E7DD;
+            color: #0F5132;
+            border: 1px solid #BADBCC;
+        }
+
+        /* Footer */
         footer.bg-light {
-            background-color: var(--pastel-purple) !important;
-            border-top: 1px solid rgba(125, 143, 55, 0.2);
-        }
-
-        footer .text-muted {
-            color: var(--text-dark) !important;
-            font-weight: 500;
-        }
-
-        h1,
-        .breadcrumb-item.active {
-            color: var(--text-dark) !important;
+            background-color: #ffffff !important;
+            border-top: 1px solid var(--lavender-mist);
         }
     </style>
 </head>
 
 <body class="sb-nav-fixed">
-    <nav class="sb-topnav navbar navbar-expand navbar-dark">
-        <a class="navbar-brand ps-3" href="dashboard_admin.php">RAHAYU ADMIN</a>
+    <nav class="sb-topnav navbar navbar-expand navbar-dark navbar-admin-custom">
+        <a class="navbar-brand ps-3" href="dashboard_admin.php"><i class="fas fa-crown text-warning me-2"></i>RAHAYU ADMIN</a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <ul class="navbar-nav ms-auto me-3 me-lg-4">
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i> <?php echo isset($_SESSION['nama']) ? htmlspecialchars($_SESSION['nama']) : 'Administrator'; ?></a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                <a class="nav-link dropdown-toggle fw-bold" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-fw me-1"></i> <?php echo isset($_SESSION['nama']) ? htmlspecialchars($_SESSION['nama']) : 'Administrator'; ?>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item fw-medium text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                 </ul>
             </li>
         </ul>
@@ -201,36 +251,37 @@ if ($res_chart) {
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
-                    <div class="nav">
+                    <div class="nav mt-3">
                         <div class="sb-sidenav-menu-heading">Utama</div>
                         <a class="nav-link active" href="dashboard_admin.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        <div class="sb-sidenav-menu-heading">Manajemen Data</div>
+
+                        <div class="sb-sidenav-menu-heading mt-2">Manajemen Data</div>
                         <a class="nav-link" href="kategori.php">
-                            <div class="sb-nav-link-icon"><i class="fas fa-folder"></i></div>Kelola Kategori
+                            <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>Kelola Kategori
                         </a>
                         <a class="nav-link" href="produk.php">
-                            <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>Kelola Produk
+                            <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>Kelola Produk
                         </a>
                         <a class="nav-link" href="sales.php">
-                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>Pengelolaan Sales
+                            <div class="sb-nav-link-icon"><i class="fas fa-user-tie"></i></div>Pengelolaan Sales
                         </a>
                         <a class="nav-link" href="promo.php">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>Kelola Promo
+                            <div class="sb-nav-link-icon"><i class="fas fa-percent"></i></div>Kelola Promo
                         </a>
                         <a class="nav-link" href="orders.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>Pesanan Masuk
                         </a>
                         <a class="nav-link" href="katalog.php">
-                            <div class="sb-nav-link-icon"><i class="fas fa-list-ul"></i></div>Katalog Produk
+                            <div class="sb-nav-link-icon"><i class="fas fa-store"></i></div>Katalog Produk
                         </a>
                         <a class="nav-link" href="bandingkan.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>Bandingkan Produk
                         </a>
 
-                        <div class="sb-sidenav-menu-heading">Pengaturan Sistem</div>
+                        <div class="sb-sidenav-menu-heading mt-2">Pengaturan Sistem</div>
                         <a class="nav-link" href="kelola_admin.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-user-shield"></i></div>
                             Kelola Akun
@@ -238,145 +289,173 @@ if ($res_chart) {
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
-                    <div class="small">Logged in as:</div> <?php echo ucfirst($_SESSION['role'] ?? 'Admin'); ?>
+                    <div class="small text-white-50">Logged in as:</div>
+                    <span class="fw-bold text-white"><?php echo ucfirst($_SESSION['role'] ?? 'Admin'); ?></span>
                 </div>
             </nav>
         </div>
 
         <div id="layoutSidenav_content">
             <main>
-                <div class="container-fluid px-4">
-                    <h1 class="mt-4">Dashboard Admin</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Ringkasan Sistem Informasi E-Catalogue</li>
-                    </ol>
+                <div class="container-fluid px-4 py-4">
+                    <div class="d-flex justify-content-between align-items-end mb-4">
+                        <div>
+                            <h2 class="fw-bolder mb-1" style="color: var(--space-cadet);">Dashboard Overview</h2>
+                            <p class="text-muted mb-0">Ringkasan Sistem Informasi E-Catalogue Rahayu</p>
+                        </div>
+                        <div class="text-muted small fw-medium">
+                            <i class="far fa-calendar-alt me-1"></i> <?php echo date('l, d F Y'); ?>
+                        </div>
+                    </div>
 
-                    <div class="row">
-                        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
-                            <div class="card bg-custom-kategori text-white h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
-                                    <span>Data Kategori</span>
-                                    <h3 class="fw-bold mb-0"><?php echo $countKategori; ?></h3>
+                    <div class="row g-4 mb-4">
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="summary-card border-l-kategori h-100 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase fw-bold text-kategori small mb-1">Data Kategori</div>
+                                        <h3 class="fw-bold text-dark mb-0"><?php echo $countKategori; ?></h3>
+                                    </div>
                                 </div>
-                                <div class="card-footer d-flex align-items-center justify-content-between" style="background: rgba(0,0,0,0.15);">
-                                    <a class="small text-white stretched-link text-decoration-none" href="kategori.php">Lihat Detail</a>
-                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                </div>
+                                <i class="fas fa-tags summary-icon text-kategori"></i>
+                                <a href="kategori.php" class="stretched-link"></a>
                             </div>
                         </div>
-                        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
-                            <div class="card bg-custom-produk text-white h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
-                                    <span>Katalog Produk</span>
-                                    <h3 class="fw-bold mb-0"><?php echo $countProduk; ?></h3>
+
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="summary-card border-l-produk h-100 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase fw-bold text-produk small mb-1">Total Produk</div>
+                                        <h3 class="fw-bold text-dark mb-0"><?php echo $countProduk; ?></h3>
+                                    </div>
                                 </div>
-                                <div class="card-footer d-flex align-items-center justify-content-between" style="background: rgba(0,0,0,0.15);">
-                                    <a class="small text-white stretched-link text-decoration-none" href="produk.php">Lihat Detail</a>
-                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                </div>
+                                <i class="fas fa-box-open summary-icon text-produk"></i>
+                                <a href="produk.php" class="stretched-link"></a>
                             </div>
                         </div>
-                        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
-                            <div class="card bg-custom-sales text-white h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
-                                    <span>Data Sales</span>
-                                    <h3 class="fw-bold mb-0"><?php echo $countSales; ?></h3>
+
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="summary-card border-l-sales h-100 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase fw-bold text-sales small mb-1">Data Sales</div>
+                                        <h3 class="fw-bold text-dark mb-0"><?php echo $countSales; ?></h3>
+                                    </div>
                                 </div>
-                                <div class="card-footer d-flex align-items-center justify-content-between" style="background: rgba(0,0,0,0.15);">
-                                    <a class="small text-white stretched-link text-decoration-none" href="sales.php">Lihat Detail</a>
-                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                </div>
+                                <i class="fas fa-user-tie summary-icon text-sales"></i>
+                                <a href="sales.php" class="stretched-link"></a>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6 col-sm-6 mb-4">
-                            <div class="card bg-custom-promo text-white h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
-                                    <span>Promo Aktif</span>
-                                    <h3 class="fw-bold mb-0"><?php echo $countPromo; ?></h3>
+
+                        <div class="col-xl-3 col-md-6 col-sm-6">
+                            <div class="summary-card border-l-promo h-100 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase fw-bold text-promo small mb-1">Promo Aktif</div>
+                                        <h3 class="fw-bold text-dark mb-0"><?php echo $countPromo; ?></h3>
+                                    </div>
                                 </div>
-                                <div class="card-footer d-flex align-items-center justify-content-between" style="background: rgba(0,0,0,0.15);">
-                                    <a class="small text-white stretched-link text-decoration-none" href="promo.php">Lihat Detail</a>
-                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                </div>
+                                <i class="fas fa-percent summary-icon text-promo"></i>
+                                <a href="promo.php" class="stretched-link"></a>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6 col-sm-6 mb-4">
-                            <div class="card bg-custom-pesanan text-white h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
-                                    <span>Pesanan Baru</span>
-                                    <h3 class="fw-bold mb-0"><?php echo $countOrder; ?></h3>
+
+                        <div class="col-xl-3 col-md-6 col-sm-6">
+                            <div class="summary-card border-l-pesanan h-100 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-uppercase fw-bold text-pesanan small mb-1">Pesanan Baru (Pending)</div>
+                                        <h3 class="fw-bold text-dark mb-0"><?php echo $countOrder; ?></h3>
+                                    </div>
                                 </div>
-                                <div class="card-footer d-flex align-items-center justify-content-between" style="background: rgba(0,0,0,0.15);">
-                                    <a class="small text-white stretched-link text-decoration-none" href="orders.php">Lihat Detail</a>
-                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                </div>
+                                <i class="fas fa-shopping-cart summary-icon text-pesanan"></i>
+                                <a href="orders.php" class="stretched-link"></a>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-4">
                         <div class="col-xl-6">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <i class="fas fa-chart-bar me-1"></i>
-                                    Perbandingan Performa Klik Link Marketplace External
+                            <div class="card panel-card h-100">
+                                <div class="panel-header">
+                                    <i class="fas fa-chart-pie me-2" style="color: var(--old-heliotrope);"></i>
+                                    Perbandingan Klik Link Eksternal
                                 </div>
-                                <div class="card-body bg-white">
+                                <div class="card-body bg-white d-flex align-items-center">
                                     <canvas id="marketplaceChart" width="100%" height="50"></canvas>
                                 </div>
-                                <div class="card-footer small text-muted bg-white">
-                                    Diperbarui secara real-time dari log_klik_marketplace.
+                                <div class="card-footer small text-muted bg-white border-0 pt-0 pb-3 text-center">
+                                    <i class="fas fa-clock me-1"></i> Data real-time log klik marketplace
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-xl-6">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <i class="fas fa-table me-1"></i>
-                                    Informasi Pesanan Terbaru
+                            <div class="card panel-card h-100">
+                                <div class="panel-header">
+                                    <i class="fas fa-clipboard-list me-2" style="color: var(--old-heliotrope);"></i>
+                                    5 Pesanan Masuk Terakhir
                                 </div>
-                                <div class="card-body bg-white">
-                                    <table id="datatablesSimple" class="table table-striped table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Tgl Pesan</th>
-                                                <th>Pelanggan</th>
-                                                <th>Sales</th>
-                                                <th>Total Bayar</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $orders = $koneksi->query("SELECT o.*, u.nama_lengkap as nama_sales 
+                                <div class="card-body bg-white p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead style="background-color: var(--space-cadet); color: white;">
+                                                <tr>
+                                                    <th class="ps-3 border-0 py-3 font-weight-normal">Tanggal</th>
+                                                    <th class="border-0 py-3 font-weight-normal">Pelanggan</th>
+                                                    <th class="border-0 py-3 font-weight-normal">Sales</th>
+                                                    <th class="border-0 py-3 text-end font-weight-normal">Total</th>
+                                                    <th class="border-0 py-3 text-center pe-3 font-weight-normal">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="border-top-0">
+                                                <?php
+                                                $orders = $koneksi->query("SELECT o.*, u.nama_lengkap as nama_sales 
                                                                            FROM orders o JOIN users u ON o.id_user = u.id_user 
                                                                            ORDER BY tgl_pesan DESC LIMIT 5");
-                                            while ($row = $orders->fetch_assoc()):
-                                            ?>
-                                                <tr>
-                                                    <td><?php echo date('d/m/Y H:i', strtotime($row['tgl_pesan'])); ?></td>
-                                                    <td><?php echo htmlspecialchars($row['nama_pelanggan']); ?></td>
-                                                    <td><?php echo htmlspecialchars($row['nama_sales']); ?></td>
-                                                    <td>Rp <?php echo number_format($row['total_bayar'], 0, ',', '.'); ?></td>
-                                                    <td>
-                                                        <span class="badge <?php echo ($row['status_order'] == 'pending') ? 'bg-warning text-dark' : 'bg-success'; ?>">
-                                                            <?php echo ucfirst($row['status_order']); ?>
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        </tbody>
-                                    </table>
+                                                if ($orders->num_rows > 0):
+                                                    while ($row = $orders->fetch_assoc()):
+                                                ?>
+                                                        <tr>
+                                                            <td class="ps-3 text-muted small"><?php echo date('d/m/y H:i', strtotime($row['tgl_pesan'])); ?></td>
+                                                            <td class="fw-bold" style="color: var(--space-cadet);"><?php echo htmlspecialchars($row['nama_pelanggan']); ?></td>
+                                                            <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($row['nama_sales']); ?></span></td>
+                                                            <td class="text-end fw-semibold text-danger">Rp <?php echo number_format($row['total_bayar'], 0, ',', '.'); ?></td>
+                                                            <td class="text-center pe-3">
+                                                                <span class="badge rounded-pill px-3 py-1 <?php echo ($row['status_order'] == 'pending') ? 'badge-status-pending' : 'badge-status-selesai'; ?>">
+                                                                    <?php echo ucfirst($row['status_order']); ?>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    <?php
+                                                    endwhile;
+                                                else:
+                                                    ?>
+                                                    <tr>
+                                                        <td colspan="5" class="text-center py-4 text-muted">Belum ada data pesanan.</td>
+                                                    </tr>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0 text-center py-3">
+                                    <a href="orders.php" class="btn btn-sm btn-outline-secondary rounded-pill px-4">Lihat Semua Pesanan <i class="fas fa-arrow-right ms-1"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </main>
+
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">PT Rahayu Karunia Utama &copy; Rahayu</div>
+                        <div class="text-muted fw-medium">PT Rahayu Karunia Utama &copy; <?php echo date('Y'); ?> E-Catalogue</div>
+                        <div>
+                            <span class="text-muted">Designed for Rahayu</span>
+                        </div>
                     </div>
                 </div>
             </footer>
@@ -388,15 +467,10 @@ if ($res_chart) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
     <script>
         window.addEventListener('DOMContentLoaded', event => {
-            const datatablesSimple = document.getElementById('datatablesSimple');
-            if (datatablesSimple) {
-                new simpleDatatables.DataTable(datatablesSimple);
-            }
-
             // ==================== INISIALISASI CHART.JS ====================
+            // (Logika dan Data Chart Tidak Berubah, Hanya Penyesuaian Warna Tema)
             const ctx = document.getElementById('marketplaceChart').getContext('2d');
             const marketplaceChart = new Chart(ctx, {
                 type: 'bar',
@@ -410,16 +484,18 @@ if ($res_chart) {
                             <?php echo $chart_data['lazada']; ?>
                         ],
                         backgroundColor: [
-                            'rgba(37, 37, 37, 0.85)', // TikTok
-                            'rgba(238, 77, 45, 0.85)', // Shopee
-                            'rgba(15, 26, 162, 0.85)' // Lazada
+                            '#231F48', // Space Cadet (TikTok)
+                            '#BB3F95', // Royal Fuchsia (Shopee)
+                            '#6B4773' // Old Heliotrope (Lazada)
                         ],
                         borderColor: [
-                            'rgba(37, 37, 37, 1)',
-                            'rgba(238, 77, 45, 1)',
-                            'rgba(15, 26, 162, 1)'
+                            '#121026',
+                            '#963276',
+                            '#4a3150'
                         ],
-                        borderWidth: 1.5
+                        borderWidth: 0,
+                        borderRadius: 5,
+                        barPercentage: 0.6
                     }]
                 },
                 options: {
@@ -427,14 +503,35 @@ if ($res_chart) {
                     scales: {
                         y: {
                             beginAtZero: true,
+                            grid: {
+                                borderDash: [2, 4],
+                                color: '#E0E1F6'
+                            },
                             ticks: {
-                                stepSize: 1
+                                stepSize: 1,
+                                color: '#6c757d'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#231F48',
+                                font: {
+                                    weight: 'bold'
+                                }
                             }
                         }
                     },
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(35, 31, 72, 0.9)',
+                            padding: 10,
+                            cornerRadius: 8
                         }
                     }
                 }
