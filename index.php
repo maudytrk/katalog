@@ -3,105 +3,155 @@ include 'koneksi.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>E-Catalogue - PT Rahayu Karunia Utama</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+        }
+
         :root {
-            --pastel-purple: #E0D2F0;
-            --soft-cream: #FCF8F1;
-            --olive-green: #7D8F37;
-            --dark-olive: #5A6926;
-            --text-dark: #4A4036;
+            --bg-lavender: #E0E1F6;
+            --accent-indigo: #241F48;
+            --accent-plum: #6C4773;
+            --accent-gray: #B0B7CA;
+            --soft-cream: #F8F9FA;
         }
-        body { background-color: var(--soft-cream); color: var(--text-dark); }
-        .navbar.bg-light { background-color: var(--pastel-purple) !important; border-bottom: none; }
-        .navbar-brand strong { color: var(--text-dark); }
-        .navbar-brand .text-primary { color: var(--olive-green) !important; }
+
+        body {
+            background-color: var(--soft-cream);
+            color: var(--accent-indigo);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Hero Section dengan Gradient Animasi Halus */
         .hero-section {
-            background: linear-gradient(rgba(252, 248, 241, 0.6), rgba(224, 210, 240, 0.4)), url('https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
-            background-size: cover; background-position: center; padding: 100px 0; color: var(--text-dark); 
+            background: linear-gradient(rgba(36, 31, 72, 0.75), rgba(108, 71, 115, 0.65)), url('https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            /* Parallax Effect */
+            padding: 140px 0 100px 0;
+            color: white;
+            margin-top: -85px;
+            /* Menarik hero ke atas agar navbar glassmorphism terlihat menumpuk */
         }
-        .btn-primary { background-color: var(--olive-green) !important; border-color: var(--olive-green) !important; color: white !important; }
-        .btn-primary:hover { background-color: var(--dark-olive) !important; border-color: var(--dark-olive) !important; }
-        .search-bar .card { background-color: white; border: 1px solid var(--pastel-purple) !important; }
-        .card { background-color: white; }
-        .text-primary { color: var(--olive-green) !important; }
-        .btn-outline-primary { color: var(--olive-green); border-color: var(--olive-green); }
-        .btn-outline-primary:hover { background-color: var(--olive-green); border-color: var(--olive-green); color: white; }
-        .badge.bg-danger { background-color: var(--olive-green) !important; }
-        footer.bg-dark { background-color: var(--pastel-purple) !important; }
-        footer h5, footer p, footer .text-white, footer .text-muted { color: var(--text-dark) !important; }
-        footer hr { background-color: var(--olive-green); opacity: 0.2; }
-        .navbar-brand img { height: 40px; }
-        .btn-marketplace { font-size: 0.85rem; padding: 5px 10px; }
+
+        .btn-primary {
+            background-color: var(--accent-indigo) !important;
+            border-color: var(--accent-indigo) !important;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-plum) !important;
+            border-color: var(--accent-plum) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 71, 115, 0.4);
+        }
+
+        .search-bar .card {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+            border-radius: 50rem;
+            box-shadow: 0 15px 35px rgba(36, 31, 72, 0.1) !important;
+        }
+
+        /* Card Produk Interaktif */
+        .product-card {
+            background-color: white;
+            border-radius: 15px;
+            border: 1px solid #eee;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(36, 31, 72, 0.15) !important;
+            border-color: var(--bg-lavender);
+        }
+
+        .product-card img {
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .btn-outline-primary {
+            color: var(--accent-indigo);
+            border: 2px solid var(--accent-indigo);
+            font-weight: 600;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--accent-indigo);
+            border-color: var(--accent-indigo);
+            color: white;
+        }
+
+        footer {
+            background-color: var(--accent-indigo) !important;
+            color: var(--bg-lavender) !important;
+        }
+
+        footer hr {
+            background-color: var(--accent-gray);
+            opacity: 0.3;
+        }
     </style>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">
-        <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" href="#home">
-                <strong>RAHAYU</strong> <span class="text-primary">CATALOGUE</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#populer">🔥 Terpopuler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="katalog.php">Katalog Produk</a></li>
-                    <li class="nav-item"><a class="nav-link" href="katalog_promo.php">Promo & Diskon</a></li>
-                    <li class="nav-item"><a class="nav-link" href="bandingkan.php">Bandingkan</a></li>
-                    <li class="nav-item"><a class="nav-link" href="lacak_pesanan.php">Lacak Pesanan</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                </ul>
-                <div class="d-flex">
-                    <a href="login.php" class="btn btn-outline-dark">
-                        <i class="bi-person-fill me-1"></i> Admin Login
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <?php include 'navbar.php'; ?>
 
     <header id="home" class="hero-section text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bolder">Inner Wanita Berkualitas</h1>
-            <p class="lead fw-normal text-white-50 mb-4">Temukan kenyamanan terbaik untuk aktivitas harian Anda</p>
-            <a href="katalog.php" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold">Lihat Katalog</a>
+        <div class="container position-relative" style="z-index: 2;">
+            <span class="badge bg-light text-dark px-3 py-2 rounded-pill mb-3 shadow-sm fw-bold" style="letter-spacing: 2px;">EST. 2011</span>
+            <h1 class="display-4 fw-bolder mb-3 shadow-sm" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">Inner Wanita Berkualitas</h1>
+            <p class="lead fw-normal mb-5" style="color: var(--bg-lavender); text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Temukan sentuhan kenyamanan sempurna untuk aktivitas harian Anda</p>
+            <a href="katalog.php" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold"><i class="bi bi-cart3 me-2"></i>Jelajahi Katalog</a>
         </div>
     </header>
 
-    <div class="container search-bar mb-5">
-        <div class="card shadow border-0">
-            <div class="card-body p-3">
-                <form action="index.php#populer" method="GET" class="row g-2">
-                    <div class="col-md-10">
-                        <input type="text" name="search" class="form-control form-control-lg border-0" placeholder="Cari produk inner (misal: Manset, Ciput)..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+    <div class="container search-bar mb-5" style="margin-top: -45px; position: relative; z-index: 10;">
+        <div class="card border-0">
+            <div class="card-body p-2">
+                <form action="index.php#populer" method="GET" class="row g-2 align-items-center">
+                    <div class="col-md-10 ps-4">
+                        <input type="text" name="search" class="form-control form-control-lg border-0 shadow-none bg-transparent" placeholder="Cari ciput, manset, atau legging..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary btn-lg w-100">Cari</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill"><i class="bi bi-search me-2"></i>Cari</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <section class="py-3 mb-5" id="populer">
+    <section class="py-4 mb-5" id="populer">
         <div class="container px-4 px-lg-5">
-            <div class="row mb-4">
-                <div class="col">
-                    <h3 class="fw-bold"><i class="bi bi-fire text-danger me-2"></i>
+            <div class="row mb-5 justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h3 class="fw-bold" style="color: var(--accent-indigo);"><i class="bi bi-stars text-warning me-2"></i>
                         <?php echo isset($_GET['search']) && $_GET['search'] != '' ? 'Hasil Pencarian Produk' : 'Produk Terpopuler Minggu Ini'; ?>
                     </h3>
-                    <p class="text-muted small">Daftar produk dengan minat pencarian dan klik tertinggi dari pelanggan.</p>
+                    <div class="mx-auto mt-3" style="width: 60px; height: 4px; background-color: var(--accent-plum); border-radius: 5px;"></div>
+                    <p class="text-muted mt-3">Koleksi pilihan dengan minat pencarian tertinggi dari pelanggan kami.</p>
                 </div>
             </div>
+
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-5 justify-content-center">
                 <?php
                 $today = date('Y-m-d');
@@ -121,88 +171,95 @@ include 'koneksi.php';
                                       LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
                                       ORDER BY p.jumlah_klik DESC LIMIT 10";
                 }
-                
+
                 $populer_result = $koneksi->query($populer_query);
 
                 if ($populer_result->num_rows > 0) {
-                    while($p_row = $populer_result->fetch_assoc()) {
+                    while ($p_row = $populer_result->fetch_assoc()) {
                         $has_promo = isset($p_row['diskon_persen']) && $p_row['diskon_persen'] > 0;
                 ?>
-                <div class="col mb-4">
-                    <div class="card h-100 shadow-sm border-0 position-relative">
-                        <div class="position-absolute top-0 start-0 m-2 z-index-2">
-                            <span class="badge bg-dark opacity-75 small">
-                                <i class="bi bi-eye-fill me-1"></i> <?php echo $p_row['jumlah_klik']; ?> Klik
-                            </span>
-                        </div>
-                        
-                        <?php if ($has_promo): ?>
-                        <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-danger text-white fw-bold px-2 py-1 rounded">
-                                -<?php echo $p_row['diskon_persen']; ?>%
-                            </span>
-                        </div>
-                        <?php endif; ?>
+                        <div class="col mb-5">
+                            <div class="card h-100 product-card position-relative">
+                                <div class="position-absolute top-0 start-0 m-2" style="z-index: 2;">
+                                    <span class="badge shadow-sm small" style="background-color: rgba(36, 31, 72, 0.85); backdrop-filter: blur(5px);">
+                                        <i class="bi bi-eye-fill me-1"></i> <?php echo $p_row['jumlah_klik']; ?>
+                                    </span>
+                                </div>
 
-                        <img class="card-img-top" src="assets/img/<?php echo $p_row['foto'] ? $p_row['foto'] : 'no-image.jpg'; ?>" alt="Foto Produk" />
-                        <div class="card-body p-3 text-center">
-                            <small class="text-muted d-block"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
-                            <h6 class="fw-bold text-truncate mb-1"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
-                            
-                            <div class="product-price">
-                                <?php if ($has_promo): 
-                                    $harga_akhir = $p_row['harga'] - ($p_row['harga'] * ($p_row['diskon_persen'] / 100));
-                                ?>
-                                    <span class="text-muted text-decoration-line-through small d-block">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
-                                    <span class="text-danger fw-semibold fs-6">Rp <?php echo number_format($harga_akhir, 0, ',', '.'); ?></span>
-                                <?php else: ?>
-                                    <span class="text-primary fw-semibold fs-6">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
+                                <?php if ($has_promo): ?>
+                                    <div class="position-absolute top-0 end-0 m-2" style="z-index: 2;">
+                                        <span class="badge bg-danger text-white fw-bold px-2 py-1 rounded shadow-sm">
+                                            -<?php echo $p_row['diskon_persen']; ?>%
+                                        </span>
+                                    </div>
                                 <?php endif; ?>
+
+                                <div style="overflow: hidden; height: 220px; background-color: var(--bg-lavender);">
+                                    <img class="card-img-top w-100 h-100" style="object-fit: cover;" src="assets/img/<?php echo !empty($p_row['foto']) ? htmlspecialchars($p_row['foto']) : 'no-image.jpg'; ?>" alt="Foto Produk" />
+                                </div>
+
+                                <div class="card-body p-3 text-center d-flex flex-column">
+                                    <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                    <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
+
+                                    <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
+                                        <?php if ($has_promo):
+                                            $harga_akhir = $p_row['harga'] - ($p_row['harga'] * ($p_row['diskon_persen'] / 100));
+                                        ?>
+                                            <span class="text-muted text-decoration-line-through small d-block">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
+                                            <span class="fw-bold fs-6" style="color: #D32F2F;">Rp <?php echo number_format($harga_akhir, 0, ',', '.'); ?></span>
+                                        <?php else: ?>
+                                            <span class="fw-bold fs-6" style="color: var(--accent-indigo);">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                    <button class="btn btn-outline-primary btn-sm w-100 rounded-pill btn-lihat-detail py-2" data-id="<?php echo $p_row['id_produk']; ?>">Lihat Spesifikasi</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                            <button class="btn btn-outline-primary btn-sm w-100 btn-lihat-detail" data-id="<?php echo $p_row['id_produk']; ?>">Detail Produk</button>
-                        </div>
-                    </div>
-                </div>
-                <?php 
+                <?php
                     }
                 } else {
-                    echo "<div class='col-12 text-center py-5'><p class='text-muted'>Produk yang Anda cari tidak ditemukan.</p></div>";
+                    echo "<div class='col-12 text-center py-5'><div class='p-5 rounded-4 shadow-sm' style='background-color: var(--bg-lavender);'><i class='bi bi-search display-4 text-muted mb-3'></i><p class='text-muted fw-bold'>Produk yang Anda cari tidak ditemukan.</p></div></div>";
                 }
                 ?>
             </div>
         </div>
     </section>
 
-    <footer class="py-5 bg-dark">
+    <footer class="py-5">
         <div class="container">
-            <div class="row text-white">
+            <div class="row">
                 <div id="about" class="col-md-6 mb-4 mb-md-0">
-                    <h5>PT Rahayu Karunia Utama</h5>
-                    <p class="small text-muted">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami.</p>
+                    <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
                 </div>
                 <div id="contact" class="col-md-6 text-md-end">
-                    <h5>Hubungi Kami</h5>
-                    <p class="small text-muted">Jl. Raya Industri No. 123, Jakarta<br>Email: info@rahayu.com<br>WhatsApp: +62 812-3456-7890</p>
+                    <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
+                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Jl. Raya Industri, Tasikmalaya<br>
+                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
+                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
+                    </p>
                 </div>
             </div>
-            <hr class="bg-secondary">
-            <p class="m-0 text-center text-white">PT Rahayu Karunia Utama &copy; Rahayu</p>
+            <hr class="mt-4 mb-3">
+            <p class="m-0 text-center small opacity-75 text-white">&copy; <?php echo date('Y'); ?> E-Catalogue Toko Rahayu. All Rights Reserved.</p>
         </div>
     </footer>
 
     <div class="modal fade" id="modalDetailProduk" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header border-0 bg-light">
-                    <h5 class="modal-title fw-bold text-dark" id="modalDetailLabel">Detail Produk</h5>
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0" style="background-color: var(--bg-lavender); border-radius: 1rem 1rem 0 0;">
+                    <h5 class="modal-title fw-bold" style="color: var(--accent-indigo);" id="modalDetailLabel"><i class="bi bi-info-circle me-2"></i>Detail Spesifikasi Produk</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4" id="isiKontenModal">
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <p class="text-muted small mt-2">Sedang memuat data produk...</p>
+                    <div class="text-center py-5">
+                        <div class="spinner-border" style="color: var(--accent-plum);" role="status"></div>
+                        <p class="small mt-3 fw-semibold" style="color: var(--accent-indigo);">Menyiapkan data katalog...</p>
                     </div>
                 </div>
             </div>
@@ -210,22 +267,35 @@ include 'koneksi.php';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Logika Animasi Navbar saat Scroll
+            const navbar = document.querySelector('.glass-navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                    navbar.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
+                } else {
+                    navbar.style.background = 'rgba(224, 225, 246, 0.85)';
+                    navbar.style.boxShadow = 'none';
+                }
+            });
+
+            // Logika Load Detail Modal
             const modalDetail = new bootstrap.Modal(document.getElementById('modalDetailProduk'));
             const kontainerIsi = document.getElementById('isiKontenModal');
 
             document.querySelectorAll('.btn-lihat-detail').forEach(button => {
                 button.addEventListener('click', function() {
                     const idProduk = this.getAttribute('data-id');
-                    
+
                     kontainerIsi.innerHTML = `
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <p class="text-muted small mt-2">Sedang memuat data produk...</p>
+                        <div class="text-center py-5">
+                            <div class="spinner-border" style="color: var(--accent-plum);" role="status"></div>
+                            <p class="small mt-3 fw-semibold" style="color: var(--accent-indigo);">Menyiapkan data katalog...</p>
                         </div>`;
-                    
+
                     modalDetail.show();
 
                     fetch('detail.php?id=' + idProduk)
@@ -236,8 +306,9 @@ include 'koneksi.php';
                         .catch(error => {
                             kontainerIsi.innerHTML = `
                                 <div class="text-center py-4 text-danger">
-                                    <i class="bi bi-exclamation-triangle display-4"></i>
-                                    <p class="mt-2">Gagal memuat data produk. Coba lagi nanti.</p>
+                                    <i class="bi bi-wifi-off display-4 mb-3"></i>
+                                    <h6 class="fw-bold">Koneksi Terputus</h6>
+                                    <p class="small text-muted">Aplikasi dalam mode offline. Pastikan fitur ini tersimpan di cache.</p>
                                 </div>`;
                         });
                 });
@@ -245,4 +316,5 @@ include 'koneksi.php';
         });
     </script>
 </body>
+
 </html>
