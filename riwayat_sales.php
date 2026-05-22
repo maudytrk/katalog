@@ -128,6 +128,16 @@ $result_riwayat = $koneksi->query($query_riwayat);
             background-color: var(--accent-indigo);
             color: white;
         }
+
+        footer {
+            background-color: var(--accent-indigo) !important;
+            color: var(--bg-lavender) !important;
+        }
+
+        footer hr {
+            background-color: var(--accent-gray);
+            opacity: 0.3;
+        }
     </style>
 </head>
 
@@ -226,6 +236,27 @@ $result_riwayat = $koneksi->query($query_riwayat);
 
         </div>
     </div>
+    <footer class="py-5">
+        <div class="container">
+            <div class="row">
+                <div id="about" class="col-md-6 mb-4 mb-md-0">
+                    <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+                </div>
+                <div id="contact" class="col-md-6 text-md-end">
+                    <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
+                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Jl. Raya Industri, Tasikmalaya<br>
+                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
+                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
+                    </p>
+                </div>
+            </div>
+            <hr class="mt-4 mb-3">
+            <p class="m-0 text-center small opacity-75 text-white">&copy; <?php echo date('Y'); ?> E-Catalogue Toko Rahayu. All Rights Reserved.</p>
+        </div>
+    </footer>
+
 
     <div style="height: 50px;"></div>
 
