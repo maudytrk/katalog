@@ -283,7 +283,7 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
         <?php if ($total_produk < 2): ?>
             <div class="card border-0 shadow-sm p-5 text-center bg-white rounded-3">
                 <div class="py-4">
-                    <i class="fas fa-compress-alt fa-3x mb-3" style="color: var(--old-heliotrope) !important;"></i>
+                    <i class="fas fa-compress-alt fa-3x text-muted mb-3" style="color: var(--navbar-purple) !important;"></i>
                     <h4 class="text-purple fw-semibold">Produk Pembanding Kurang</h4>
                     <p class="text-muted mx-auto" style="max-width: 450px;">Silakan pilih minimal 2 atau maksimal 4 produk di halaman katalog terlebih dahulu untuk melihat visualisasi tabel perbandingan.</p>
                     <a href="katalog.php" class="btn btn-olive fw-bold rounded-pill px-4 mt-2">Pilih Produk Sekarang</a>
@@ -291,7 +291,7 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
             </div>
         <?php else: ?>
 
-            <div class="table-responsive shadow-sm rounded-3 overflow-hidden">
+            <div class="table-responsive shadow-sm rounded-3">
                 <table class="table table-bordered compare-table mb-0 text-center align-middle">
                     <tbody>
                         <tr>
@@ -469,28 +469,49 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <footer class="py-5">
-        <div class="container">
-            <div class="row">
-                <div id="about" class="col-md-6 mb-4 mb-md-0">
-                    <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+    <?php if ($is_login && $user_role === 'admin') : ?>
+        <footer class="py-5 mt-auto" style="background-color: var(--space-cadet) !important; color: #ffffff !important;">
+            <div class="container">
+                <div class="row">
+                    <div id="about" class="col-md-6 mb-4 mb-md-0">
+                        <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
+                        <p class="small" style="line-height: 1.8; color: #ccc;">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011.</p>
+                    </div>
+                    <div id="contact" class="col-md-6 text-md-end">
+                        <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
+                        <p class="small" style="line-height: 1.8; color: #ccc;">
+                            <i class="bi bi-geo-alt-fill me-2"></i>Kota Depok<br>
+                            <i class="bi bi-envelope-fill me-2"></i>info@rahayu.com<br>
+                            <i class="bi bi-whatsapp me-2"></i>+62 812-3456-7890
+                        </p>
+                    </div>
                 </div>
-                <div id="contact" class="col-md-6 text-md-end">
-                    <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
-                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
-                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
-                    </p>
-                </div>
+                <hr class="mt-4 mb-3 border-secondary">
+                <p class="m-0 text-center small opacity-75">&copy; <?php echo date('Y'); ?> E-Catalogue Toko Rahayu. All Rights Reserved.</p>
             </div>
-            <hr class="mt-4 mb-3">
-            <p class="m-0 text-center small opacity-75 text-white">&copy; <?php echo date('Y'); ?> E-Catalogue Toko Rahayu. All Rights Reserved.</p>
-        </div>
-    </footer>
-
-
+        </footer>
+    <?php else : ?>
+        <footer class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div id="about" class="col-md-6 mb-4 mb-md-0">
+                        <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
+                        <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+                    </div>
+                    <div id="contact" class="col-md-6 text-md-end">
+                        <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
+                        <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
+                            <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
+                            <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
+                            <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
+                        </p>
+                    </div>
+                </div>
+                <hr class="mt-4 mb-3">
+                <p class="m-0 text-center small opacity-75 text-white">&copy; <?php echo date('Y'); ?> E-Catalogue Toko Rahayu. All Rights Reserved.</p>
+            </div>
+        </footer>
+    <?php endif; ?>
     <?php include 'modal_logout.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
