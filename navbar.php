@@ -87,11 +87,23 @@ $nama_user = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Pengguna';
         box-shadow: 0 5px 15px rgba(36, 31, 72, 0.2);
     }
 
+    /* PERBAIKAN: Styling khusus untuk tombol dropdown profil */
     .badge-user {
         background-color: white !important;
         color: var(--accent-indigo) !important;
         border: 1px solid var(--accent-gray);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .badge-user:hover, .badge-user:focus {
+        background-color: var(--soft-cream) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-item-custom:hover {
+        background-color: var(--bg-lavender);
+        color: var(--accent-indigo);
     }
 </style>
 
@@ -125,18 +137,34 @@ $nama_user = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Pengguna';
             <?php elseif ($role === 'sales') : ?>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                     <li class="nav-item"><a class="nav-link" href="index.php#home"><i class="fas fa-home me-1"></i>Home</a></li>
-                    
                     <li class="nav-item"><a class="nav-link" href="katalog.php"><i class="fas fa-box me-1"></i>Katalog Produk</a></li>
                     <li class="nav-item"><a class="nav-link" href="katalog_promo.php"><i class="fas fa-tags me-1"></i>Promo</a></li>
                     <li class="nav-item"><a class="nav-link" href="riwayat_sales.php"><i class="fas fa-history me-1"></i>Riwayat Order Saya</a></li>
                     <li class="nav-item"><a class="nav-link" href="bandingkan.php"><i class="fas fa-balance-scale me-1"></i>Bandingkan</a></li>
                     <li class="nav-item"><a class="nav-link" href="lacak_pesanan.php"><i class="fas fa-search-location me-1"></i>Lacak</a></li>
                 </ul>
-                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-                    <span class="badge-user px-3 py-2 rounded-pill small fw-bold">
-                        <i class="fas fa-user-tie me-2" style="color: var(--accent-plum);"></i>Sales: <?php echo htmlspecialchars($nama_user); ?>
-                    </span>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#logoutModal" class="btn btn-danger fw-bold px-3 rounded-pill shadow-sm"><i class="fas fa-sign-out-alt"></i></a>
+                <div class="d-flex align-items-center mt-3 mt-lg-0 ms-lg-3">
+                    
+                    <div class="dropdown">
+                        <button class="btn badge-user px-3 py-2 rounded-pill small fw-bold dropdown-toggle d-flex align-items-center" type="button" id="profilDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-tie me-2" style="color: var(--accent-plum);"></i>
+                            Sales: <?php echo htmlspecialchars($nama_user); ?>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-4 p-2" aria-labelledby="profilDropdown">
+                            <li>
+                                <a class="dropdown-item dropdown-item-custom rounded-3 mb-1 py-2 fw-semibold" href="#" data-bs-toggle="modal" data-bs-target="#modalGantiPassword">
+                                    <i class="fas fa-key text-warning me-2"></i> Ganti Password
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider opacity-25 my-1"></li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-custom rounded-3 mt-1 py-2 fw-bold text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout Akun
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                 </div>
 
             <?php elseif ($role === 'admin') : ?>
@@ -145,11 +173,28 @@ $nama_user = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Pengguna';
                     <li class="nav-item"><a class="nav-link" href="katalog.php">Lihat Katalog</a></li>
                     <li class="nav-item"><a class="nav-link" href="orders.php">Kelola Pesanan</a></li>
                 </ul>
-                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-                    <span class="badge-user px-3 py-2 rounded-pill small fw-bold" style="border-color: #D32F2F;">
-                        <i class="fas fa-user-shield me-2 text-danger"></i>Admin: <?php echo htmlspecialchars($nama_user); ?>
-                    </span>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#logoutModal" class="btn btn-danger fw-bold px-3 rounded-pill shadow-sm"><i class="fas fa-sign-out-alt"></i></a>
+                <div class="d-flex align-items-center mt-3 mt-lg-0 ms-lg-3">
+                    
+                    <div class="dropdown">
+                        <button class="btn badge-user px-3 py-2 rounded-pill small fw-bold dropdown-toggle d-flex align-items-center" style="border-color: #D32F2F;" type="button" id="profilDropdownAdmin" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-shield me-2 text-danger"></i>
+                            Admin: <?php echo htmlspecialchars($nama_user); ?>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-4 p-2" aria-labelledby="profilDropdownAdmin">
+                            <li>
+                                <a class="dropdown-item dropdown-item-custom rounded-3 mb-1 py-2 fw-semibold" href="#" data-bs-toggle="modal" data-bs-target="#modalGantiPassword">
+                                    <i class="fas fa-key text-warning me-2"></i> Ganti Password
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider opacity-25 my-1"></li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-custom rounded-3 mt-1 py-2 fw-bold text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout Akun
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                 </div>
             <?php endif; ?>
 
@@ -157,12 +202,16 @@ $nama_user = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Pengguna';
     </div>
 </nav>
 
-<?php if ($is_login) include 'modal_logout.php'; ?>
+<?php 
+if ($is_login) {
+    include 'modal_logout.php';
+    include 'modal_ganti_password.php'; 
+} 
+?>
 
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            // Gunakan path relatif 'sw.js' agar aman dijalankan di dalam folder Laragon/XAMPP
             navigator.serviceWorker.register('sw.js')
                 .then(reg => console.log('✅ Service Worker berhasil terdaftar. Mode Offline Siap!', reg))
                 .catch(err => console.error('❌ Pendaftaran Service Worker gagal:', err));

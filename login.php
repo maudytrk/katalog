@@ -63,61 +63,21 @@ if (isset($_POST['login'])) {
             padding: 80px;
             position: relative;
         }
-        .info-panel h1 {
-            font-weight: 800;
-            color: #2D2D2D;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-            font-size: 1.8rem;
-        }
-        .info-panel h2 {
-            font-weight: 700;
-            color: #333;
-            line-height: 1.2;
-        }
+        .info-panel h1 { font-weight: 800; color: #2D2D2D; margin-bottom: 2rem; text-transform: uppercase; font-size: 1.8rem; }
+        .info-panel h2 { font-weight: 700; color: #333; line-height: 1.2; }
         .info-panel h2 span { color: var(--rahayu-dark-purple); }
-        .info-panel p {
-            color: #555;
-            font-size: 1.1rem;
-            margin-top: 20px;
-            max-width: 450px;
-        }
-        .copyright {
-            position: absolute;
-            bottom: 40px;
-            left: 80px;
-            font-size: 0.8rem;
-            color: #666;
-        }
-        .login-panel {
-            background-color: #ffffff;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-form-wrapper {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
+        .info-panel p { color: #555; font-size: 1.1rem; margin-top: 20px; max-width: 450px; }
+        .copyright { position: absolute; bottom: 40px; left: 80px; font-size: 0.8rem; color: #666; }
+        .login-panel { background-color: #ffffff; flex: 1; display: flex; align-items: center; justify-content: center; }
+        .login-form-wrapper { width: 100%; max-width: 400px; padding: 20px; }
         .login-form-wrapper h3 { font-weight: 700; margin-bottom: 5px; }
         .login-form-wrapper p.subtitle { color: #888; font-size: 0.9rem; margin-bottom: 30px; }
         .form-control { background-color: #F9F9F9; border: 1px solid #eee; padding: 12px 15px; border-radius: 8px; }
         .input-group-text { background-color: #F9F9F9; border: 1px solid #eee; }
-        .btn-login {
-            background-color: var(--rahayu-purple);
-            border: none;
-            color: #5A4E8C;
-            font-weight: 600;
-            padding: 12px;
-            width: 100%;
-            border-radius: 25px;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
+        .btn-login { background-color: var(--rahayu-purple); border: none; color: #5A4E8C; font-weight: 600; padding: 12px; width: 100%; border-radius: 25px; margin-top: 20px; transition: 0.3s; }
         .btn-login:hover { background-color: #d1c5ff; color: #40366b; }
-        .forgot-link { text-decoration: none; font-size: 0.85rem; color: #bbb; }
+        .forgot-link { text-decoration: none; font-size: 0.85rem; color: #bbb; transition: 0.3s; }
+        .forgot-link:hover { color: var(--rahayu-dark-purple); font-weight: 600; }
         @media (max-width: 992px) { .info-panel { display: none; } }
     </style>
 </head>
@@ -161,7 +121,7 @@ if (isset($_POST['login'])) {
                         <input class="form-check-input" type="checkbox" id="remember" name="remember">
                         <label class="form-check-label small text-muted" for="remember">Ingat saya</label>
                     </div>
-                    <a class="forgot-link" href="#">Lupa Password?</a>
+                    <a class="forgot-link" href="lupa_password.php">Lupa Password?</a>
                 </div>
 
                 <button type="submit" name="login" class="btn btn-login">MASUK KE DASHBOARD →</button>
