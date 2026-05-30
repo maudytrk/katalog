@@ -124,6 +124,8 @@ $nama_user = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Pengguna';
 
             <?php elseif ($role === 'sales') : ?>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link" href="index.php#home"><i class="fas fa-home me-1"></i>Home</a></li>
+                    
                     <li class="nav-item"><a class="nav-link" href="katalog.php"><i class="fas fa-box me-1"></i>Katalog Produk</a></li>
                     <li class="nav-item"><a class="nav-link" href="katalog_promo.php"><i class="fas fa-tags me-1"></i>Promo</a></li>
                     <li class="nav-item"><a class="nav-link" href="riwayat_sales.php"><i class="fas fa-history me-1"></i>Riwayat Order Saya</a></li>
