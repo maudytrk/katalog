@@ -159,6 +159,49 @@ if (isset($_GET['hapus'])) {
             background-color: #ffffff !important;
             border-top: 1px solid var(--lavender-mist);
         }
+
+        /* CSS UNTUK PREVIEW GAMBAR & TOMBOL HAPUS (X) */
+        .preview-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .preview-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #E0E1F6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .preview-remove-btn {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            background: #FF4444;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 14px;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 2px solid white;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        .preview-remove-btn:hover {
+            background: #CC0000;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
@@ -309,7 +352,7 @@ if (isset($_GET['hapus'])) {
             <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content border-0 shadow">
-                        <form action="proses_tambah.php" method="POST" enctype="multipart/form-data">
+                        <form id="formTambahProduk" action="proses_tambah.php" method="POST" enctype="multipart/form-data">
                             <div class="modal-header modal-header-custom">
                                 <h5 class="modal-title fw-bold"><i class="fas fa-box-open me-2 text-warning"></i>Tambah Produk Baru</h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -365,10 +408,15 @@ if (isset($_GET['hapus'])) {
                                     <label class="small fw-semibold text-muted">Link Lazada</label>
                                     <input type="url" name="link_lazada" class="form-control form-control-sm" placeholder="https://lazada.co.id/...">
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold" style="color: var(--space-cadet);">Foto Produk (Bisa pilih lebih dari satu)</label>
-                                    <input type="file" name="foto[]" class="form-control" accept="image/*" multiple required>
-                                    <div class="form-text text-muted">Format yang didukung: JPG, JPEG, PNG. Maksimal 2MB.</div>
+                                
+                                <div class="mb-3 p-3 rounded" style="background-color: #F8F9FA; border: 1px dashed #B0B7CA;">
+                                    <label class="form-label fw-semibold" style="color: var(--space-cadet);"><i class="fas fa-images me-1"></i> Foto Produk (Bisa pilih/blok lebih dari satu file)</label>
+                                    
+                                    <input type="file" name="foto[]" id="fotoInput" class="form-control" accept="image/*" multiple required>
+                                    
+                                    <div class="form-text text-muted mb-3">Format: JPG, JPEG, PNG, WEBP. Maks 2MB/foto. (Tekan CTRL / Tahan layar di HP untuk memilih banyak gambar).</div>
+                                    
+                                    <div id="previewContainerMandiri" class="d-flex flex-wrap gap-2 mt-2"></div>
                                 </div>
                             </div>
                             <div class="modal-footer bg-light">
@@ -404,11 +452,65 @@ if (isset($_GET['hapus'])) {
             }
         });
 
-        // Menangkap event saat modal ditutup (hidden.bs.modal)
+        let selectedFiles = []; 
+        const fotoInput = document.getElementById('fotoInput');
+        const previewContainerMandiri = document.getElementById('previewContainerMandiri');
+
+        // Saat gambar dipilih di input bawaan
+        fotoInput.addEventListener('change', function(e) {
+            // Karena input bawaan menimpa file, kita ambil ulang daftarnya
+            selectedFiles = Array.from(e.target.files);
+            renderPreviewMandiri();
+        });
+
+        // Fungsi mencetak kotak gambar
+        function renderPreviewMandiri() {
+            previewContainerMandiri.innerHTML = ''; 
+            
+            selectedFiles.forEach((file, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'preview-wrapper';
+                
+                const imgUrl = URL.createObjectURL(file);
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.onload = () => URL.revokeObjectURL(imgUrl); 
+                
+                // Bikin tombol X
+                const removeBtn = document.createElement('span');
+                removeBtn.innerHTML = '&times;'; 
+                removeBtn.className = 'preview-remove-btn';
+                removeBtn.title = 'Batalkan gambar ini';
+                
+                // Logika Hapus: Ketika X diklik
+                removeBtn.addEventListener('click', function(e) {
+                    e.preventDefault(); 
+                    
+                    // 1. Buang file dari array Javascript
+                    selectedFiles.splice(index, 1);
+                    
+                    // 2. Perbarui isi dari <input type="file"> bawaan secara ajaib pakai DataTransfer
+                    const dataTransfer = new DataTransfer();
+                    selectedFiles.forEach(f => dataTransfer.items.add(f));
+                    fotoInput.files = dataTransfer.files; 
+                    
+                    // 3. Gambar ulang previewnya
+                    renderPreviewMandiri();
+                });
+                
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewContainerMandiri.appendChild(wrapper);
+            });
+        }
+
+        // Hapus isi form & preview ketika modal ditutup (Batal)
         var modalTambah = document.getElementById('modalTambah');
         modalTambah.addEventListener('hidden.bs.modal', function() {
             var form = modalTambah.querySelector('form');
             form.reset();
+            selectedFiles = [];
+            renderPreviewMandiri();
         });
     </script>
 </body>
