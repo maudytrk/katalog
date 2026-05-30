@@ -1,12 +1,10 @@
 <?php
 include 'koneksi.php';
 
-// Pastikan parameter ID produk dikirimkan dan valid
 if (isset($_GET['id'])) {
     $id_produk = mysqli_real_escape_string($koneksi, $_GET['id']);
     $today = date('Y-m-d');
 
-    // PERBAIKAN QUERY: Menambahkan LEFT JOIN ke tabel promo berdasarkan tanggal aktif saat ini
     $query = "SELECT p.*, k.nama_kategori, pr.diskon_persen FROM produk p 
               LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
               LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
@@ -18,18 +16,22 @@ if (isset($_GET['id'])) {
         $row = $result->fetch_assoc();
 
         $query_foto = $koneksi->query("SELECT nama_file FROM produk_foto WHERE id_produk = '$id_produk'");
-
-        // Cek apakah produk memiliki promo aktif
         $has_promo = isset($row['diskon_persen']) && $row['diskon_persen'] > 0;
-
-        // Naikkan jumlah statistik klik karena produk sedang dilihat detailnya
         $koneksi->query("UPDATE produk SET jumlah_klik = jumlah_klik + 1 WHERE id_produk = '$id_produk'");
 
-        $foto_utama = !empty($row['foto']) ? htmlspecialchars($row['foto']) : 'no-image.jpg';
+        $all_fotos = [];
+        if ($query_foto->num_rows > 0) {
+            while ($f = $query_foto->fetch_assoc()) {
+                $all_fotos[] = $f['nama_file'];
+            }
+            $query_foto->data_seek(0);
+        } else {
+            $all_fotos[] = !empty($row['foto']) ? $row['foto'] : 'no-image.jpg';
+        }
+        $json_fotos = htmlspecialchars(json_encode($all_fotos), ENT_QUOTES, 'UTF-8');
 ?>
 
         <style>
-            /* CSS untuk efek hover zoom pada gambar */
             .zoomable-img {
                 cursor: zoom-in;
                 transition: transform 0.3s ease;
@@ -37,21 +39,6 @@ if (isset($_GET['id'])) {
 
             .zoomable-img:hover {
                 transform: scale(1.02);
-            }
-
-            /* Custom Lightbox Fullscreen */
-            #customLightbox {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background-color: rgba(0, 0, 0, 0.85);
-                z-index: 9999;
-                justify-content: center;
-                align-items: center;
-                backdrop-filter: blur(5px);
             }
         </style>
 
@@ -68,10 +55,9 @@ if (isset($_GET['id'])) {
                 <div id="productSlider" class="carousel slide shadow-sm rounded border" data-bs-ride="carousel">
                     <div class="carousel-inner rounded" style="background-color: #E0E1F6;">
                         <?php
-                        // Pastikan query_foto sudah dieksekusi sebelumnya
-                        $jumlah_foto = $query_foto->num_rows;
+                        $jumlah_foto = count($all_fotos);
 
-                        if ($jumlah_foto > 0) {
+                        if ($query_foto->num_rows > 0) {
                             $i = 0;
                             while ($foto = $query_foto->fetch_assoc()) {
                                 $active = ($i == 0) ? 'active' : '';
@@ -81,18 +67,17 @@ if (isset($_GET['id'])) {
                                         class="d-block w-100 zoomable-img"
                                         alt="<?php echo htmlspecialchars($row['nama_produk']); ?>"
                                         style="height: 380px; width: 100%; object-fit: contain; background-color: #f8f9fa;"
-                                        onclick="openLightbox(this.src)">
+                                        onclick="(function(idx, arr){ var ov=document.createElement('div');ov.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.9);z-index:99999999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);';var cl=document.createElement('span');cl.innerHTML='&times;';cl.style.cssText='position:absolute;top:20px;right:40px;font-size:40px;color:#fff;cursor:pointer;z-index:1000;';cl.onclick=function(){ov.remove();};ov.appendChild(cl);var gal=document.createElement('div');gal.style.cssText='position:relative;max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow:0 10px 25px rgba(0,0,0,0.5);overflow:hidden;';var im=document.createElement('img');im.src='assets/img/'+arr[idx];im.style.cssText='max-height:90vh;max-width:85vw;object-fit:contain;border-radius:10px;';gal.appendChild(im);if(arr.length>1){var btnCss='position:absolute;top:50%;transform:translateY(-50%);font-size:28px;color:#fff;cursor:pointer;user-select:none;background:rgba(0,0,0,0.6);width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow:0 0 10px rgba(0,0,0,0.3);z-index:999;transition:background 0.3s ease;';var pr=document.createElement('div');pr.innerHTML='&#10094;';pr.style.cssText=btnCss+'left:-15px;';pr.onmouseover=function(){this.style.background='rgba(0,0,0,0.8)';};pr.onmouseout=function(){this.style.background='rgba(0,0,0,0.6)';};pr.onclick=function(e){e.stopPropagation();idx=(idx-1+arr.length)%arr.length;im.src='assets/img/'+arr[idx];};var nx=document.createElement('div');nx.innerHTML='&#10095;';nx.style.cssText=btnCss+'right:-15px;';nx.onmouseover=function(){this.style.background='rgba(0,0,0,0.8)';};nx.onmouseout=function(){this.style.background='rgba(0,0,0,0.6)';};nx.onclick=function(e){e.stopPropagation();idx=(idx+1)%arr.length;im.src='assets/img/'+arr[idx];};gal.appendChild(pr);gal.appendChild(nx);}ov.appendChild(gal);ov.onclick=function(e){if(e.target===ov)ov.remove();};document.body.appendChild(ov); })(<?php echo $i; ?>, <?php echo $json_fotos; ?>)">
                                 </div>
                         <?php
                                 $i++;
                             }
                         } else {
-                            // Jika tidak ada data di tabel produk_foto, tampilkan gambar default
                             echo '<div class="carousel-item active">
-                                    <img src="assets/img/no-image.jpg" 
+                                    <img src="assets/img/' . $all_fotos[0] . '" 
                                          class="d-block w-100 zoomable-img" 
                                          style="height: 380px; object-fit: cover;"
-                                         onclick="openLightbox(this.src)">
+                                         onclick="(function(idx, arr){ var ov=document.createElement(\'div\');ov.style.cssText=\'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.9);z-index:99999999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);\';var cl=document.createElement(\'span\');cl.innerHTML=\'&times;\';cl.style.cssText=\'position:absolute;top:20px;right:40px;font-size:40px;color:#fff;cursor:pointer;z-index:1000;\';cl.onclick=function(){ov.remove();};ov.appendChild(cl);var gal=document.createElement(\'div\');gal.style.cssText=\'position:relative;max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow:0 10px 25px rgba(0,0,0,0.5);overflow:hidden;\';var im=document.createElement(\'img\');im.src=\'assets/img/\'+arr[idx];im.style.cssText=\'max-height:90vh;max-width:85vw;object-fit:contain;border-radius:10px;\';gal.appendChild(im);ov.appendChild(gal);ov.onclick=function(e){if(e.target===ov)ov.remove();};document.body.appendChild(ov); })(0, ' . $json_fotos . ')">
                                   </div>';
                         }
                         ?>
@@ -145,7 +130,6 @@ if (isset($_GET['id'])) {
 
                         <h6 class="fw-bold mb-3" style="color: #241F48;">Aksi & Pembelian:</h6>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-
                             <?php if (!empty($row['link_shopee'])): ?>
                                 <a href="redirect.php?id_produk=<?php echo $row['id_produk']; ?>&type=marketplace&platform=shopee" target="_blank" class="btn btn-sm text-white px-3" style="background-color: #ee4d2d;">
                                     <i class="bi bi-bag-fill me-1"></i> Shopee
@@ -172,25 +156,6 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
         </div>
-
-        <div id="customLightbox" onclick="closeLightbox()">
-            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" style="z-index: 10000; padding: 15px;"></button>
-            <img id="lightboxImg" src="" style="max-height: 90vh; max-width: 90vw; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 8px;">
-        </div>
-
-        <script>
-            // Fungsi untuk membuka Lightbox
-            function openLightbox(src) {
-                document.getElementById('lightboxImg').src = src;
-                document.getElementById('customLightbox').style.display = 'flex';
-            }
-
-            // Fungsi untuk menutup Lightbox
-            function closeLightbox() {
-                document.getElementById('customLightbox').style.display = 'none';
-                document.getElementById('lightboxImg').src = '';
-            }
-        </script>
 
 <?php
     } else {
