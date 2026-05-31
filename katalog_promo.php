@@ -305,35 +305,45 @@ $result_promo = $koneksi->query($sql_promo);
             document.querySelectorAll('.btn-lihat-detail').forEach(button => {
                 button.addEventListener('click', function() {
                     const idProduk = this.getAttribute('data-id');
-                    kontainerIsi.innerHTML = `<div class="text-center py-5"><div class="spinner-border" style="color: var(--accent-plum);"></div></div>`;
+                    kontainerIsi.innerHTML = `<div class="text-center py-5"><div class="spinner-border" style="color: var(--accent-plum);"></div><p class="text-muted small mt-2 fw-semibold">Sedang memuat data produk...</p></div>`;
                     modalDetail.show();
                     fetch('detail.php?id=' + idProduk)
                         .then(response => response.text())
                         .then(htmlResponse => kontainerIsi.innerHTML = htmlResponse)
-                        .catch(() => kontainerIsi.innerHTML = `<div class="text-center py-4 text-danger"><i class="fas fa-wifi display-4"></i><p>Offline</p></div>`);
+                        .catch(() => kontainerIsi.innerHTML = `<div class="text-center py-4 text-danger"><i class="fas fa-wifi display-4 mb-2"></i><p class="mt-2 fw-bold">Aplikasi offline. Gagal memuat data baru.</p></div>`);
                 });
             });
 
-            // --- BANDINGKAN ---
+            // --- PERBAIKAN: LOGIKA BANDINGKAN (Sama Persis Seperti katalog.php) ---
             const checkboxes = document.querySelectorAll('.compare-checkbox');
             const floatingBtn = document.getElementById('compare-floating-btn');
+            const compareCount = document.getElementById('compare-count');
+            const submitBtn = document.getElementById('btn-submit-compare');
+
             if (checkboxes.length > 0) {
                 checkboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', function() {
                         const checkedCount = document.querySelectorAll('.compare-checkbox:checked').length;
-                        if (checkedCount > 2) {
-                            alert('Maksimal 2 produk.');
+                        
+                        // Mendukung hingga 4 produk
+                        if (checkedCount > 4) {
+                            alert('Maksimal memilih 4 produk untuk dibandingkan secara bersamaan agar tampilan tetap rapi.');
                             this.checked = false;
                             return;
                         }
                         floatingBtn.style.display = checkedCount > 0 ? 'block' : 'none';
-                        document.getElementById('compare-count').textContent = checkedCount;
+                        compareCount.textContent = checkedCount;
                     });
                 });
-                document.getElementById('btn-submit-compare').addEventListener('click', function() {
-                    const ids = Array.from(document.querySelectorAll('.compare-checkbox:checked')).map(cb => cb.value);
-                    if (ids.length === 1) window.location.href = 'bandingkan.php?id1=' + ids[0];
-                    else if (ids.length === 2) window.location.href = 'bandingkan.php?id1=' + ids[0] + '&id2=' + ids[1];
+
+                submitBtn.addEventListener('click', function() {
+                    const checkedBoxes = document.querySelectorAll('.compare-checkbox:checked');
+                    const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+                    if (ids.length > 0) {
+                        // Menggabungkan semua ID menjadi satu string dipisah koma (contoh: ?ids=1,2,3)
+                        window.location.href = 'bandingkan.php?ids=' + ids.join(',');
+                    }
                 });
             }
 
@@ -349,12 +359,14 @@ $result_promo = $koneksi->query($sql_promo);
                     document.getElementById('input-db-stok').value = stok;
                     document.getElementById('display-nama-produk').textContent = button.getAttribute('data-nama');
                     document.getElementById('display-harga-satuan').textContent = formatRupiah(harga);
-                    document.getElementById('display-stok').textContent = 'Sisa: ' + stok + ' Pcs';
+                    document.getElementById('display-stok').textContent = 'Sisa Stok: ' + stok + ' Pcs';
                     document.getElementById('display-total-bayar').textContent = formatRupiah(harga);
                     document.getElementById('input-qty').max = stok;
                     document.getElementById('input-qty').value = 1;
                     document.getElementById('btn-submit-order').disabled = (stok <= 0);
+                    document.getElementById('error-msg-order').style.display = 'none';
                 });
+                
                 document.getElementById('input-qty').addEventListener('input', function() {
                     let qty = parseInt(this.value) || 0;
                     const maxStok = parseInt(document.getElementById('input-db-stok').value);
