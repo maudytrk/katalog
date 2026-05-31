@@ -160,11 +160,14 @@ $today = date('Y-m-d');
         </section>
 
         <?php
-        $promo_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+        // PERBAIKAN QUERY 1: PROMO SPESIAL (Menambahkan GROUP_CONCAT Kategori)
+        $promo_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                         FROM produk p 
-                        LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                        LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+                        LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
                         JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
                         WHERE pr.diskon_persen > 0
+                        GROUP BY p.id_produk
                         ORDER BY p.id_produk DESC LIMIT 4";
         $promo_result = $koneksi->query($promo_query);
 
@@ -192,7 +195,9 @@ $today = date('Y-m-d');
                                         <img class="card-img-top w-100 h-100" style="object-fit: cover;" src="assets/img/<?php echo !empty($p_row['foto']) ? htmlspecialchars($p_row['foto']) : 'no-image.jpg'; ?>" alt="Foto Produk" />
                                     </div>
                                     <div class="card-body p-3 text-center d-flex flex-column">
-                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;">
+                                            <i class="fas fa-tag me-1"></i><?php echo htmlspecialchars($p_row['daftar_kategori'] ?? 'Tanpa Kategori'); ?>
+                                        </small>
                                         <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
                                         <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
                                             <span class="text-muted text-decoration-line-through small d-block">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
@@ -210,68 +215,8 @@ $today = date('Y-m-d');
             </section>
         <?php endif; ?>
 
-        <?php
-        $terbaru_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
-                          FROM produk p 
-                          LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
-                          LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
-                          ORDER BY p.id_produk DESC LIMIT 4";
-        $terbaru_result = $koneksi->query($terbaru_query);
-
-        if ($terbaru_result && $terbaru_result->num_rows > 0):
-        ?>
-            <section class="py-5 bg-white">
-                <div class="container px-4 px-lg-5">
-                    <div class="d-flex justify-content-between align-items-end mb-4">
-                        <div>
-                            <h3 class="fw-bold m-0" style="color: var(--accent-indigo);"><i class="bi bi-box-seam text-primary me-2"></i>Produk Terbaru</h3>
-                            <div class="mt-2" style="width: 60px; height: 4px; background-color: var(--accent-plum); border-radius: 5px;"></div>
-                        </div>
-                        <a href="katalog.php" class="text-decoration-none fw-bold" style="color: var(--accent-plum);">Lihat Katalog <i class="bi bi-arrow-right"></i></a>
-                    </div>
-                    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                        <?php while ($p_row = $terbaru_result->fetch_assoc()):
-                            $has_promo = isset($p_row['diskon_persen']) && $p_row['diskon_persen'] > 0;
-                        ?>
-                            <div class="col mb-5">
-                                <div class="card h-100 product-card position-relative border-0 shadow-sm">
-                                    <div class="position-absolute top-0 start-0 m-2" style="z-index: 2;">
-                                        <span class="badge shadow-sm small" style="background-color: rgba(36, 31, 72, 0.85); backdrop-filter: blur(5px);">Baru</span>
-                                    </div>
-                                    <?php if ($has_promo): ?>
-                                        <div class="position-absolute top-0 end-0 m-2" style="z-index: 2;">
-                                            <span class="badge bg-danger text-white fw-bold px-2 py-1 rounded shadow-sm">-<?php echo $p_row['diskon_persen']; ?>%</span>
-                                        </div>
-                                    <?php endif; ?>
-                                    <div style="overflow: hidden; height: 220px; background-color: var(--bg-lavender);">
-                                        <img class="card-img-top w-100 h-100" style="object-fit: cover;" src="assets/img/<?php echo !empty($p_row['foto']) ? htmlspecialchars($p_row['foto']) : 'no-image.jpg'; ?>" alt="Foto Produk" />
-                                    </div>
-                                    <div class="card-body p-3 text-center d-flex flex-column">
-                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
-                                        <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
-                                        <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
-                                            <?php if ($has_promo):
-                                                $harga_akhir = $p_row['harga'] - ($p_row['harga'] * ($p_row['diskon_persen'] / 100));
-                                            ?>
-                                                <span class="text-muted text-decoration-line-through small d-block">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
-                                                <span class="fw-bold fs-6" style="color: #D32F2F;">Rp <?php echo number_format($harga_akhir, 0, ',', '.'); ?></span>
-                                            <?php else: ?>
-                                                <span class="fw-bold fs-6" style="color: var(--accent-indigo);">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                                        <button class="btn btn-outline-primary btn-sm w-100 rounded-pill btn-lihat-detail py-2" data-id="<?php echo $p_row['id_produk']; ?>">Lihat Spesifikasi</button>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
-                </div>
-            </section>
-        <?php endif; ?>
-
     <?php endif; ?>
+    
     <section class="py-4 mb-5" id="populer">
         <div class="container px-4 px-lg-5">
             <div class="row mb-5 justify-content-center text-center">
@@ -286,19 +231,24 @@ $today = date('Y-m-d');
 
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-5 justify-content-center">
                 <?php
+                // PERBAIKAN QUERY 2: PRODUK TERPOPULER / PENCARIAN (Menambahkan GROUP_CONCAT Kategori)
                 if (isset($_GET['search']) && $_GET['search'] != '') {
                     $search = mysqli_real_escape_string($koneksi, $_GET['search']);
-                    $populer_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+                    $populer_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                                       FROM produk p 
-                                      LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                                      LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+                                      LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
                                       LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
                                       WHERE p.nama_produk LIKE '%$search%' OR p.deskripsi LIKE '%$search%'
+                                      GROUP BY p.id_produk
                                       ORDER BY p.jumlah_klik DESC LIMIT 10";
                 } else {
-                    $populer_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+                    $populer_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                                       FROM produk p 
-                                      LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                                      LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+                                      LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
                                       LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
+                                      GROUP BY p.id_produk
                                       ORDER BY p.jumlah_klik DESC LIMIT 10";
                 }
 
@@ -329,7 +279,9 @@ $today = date('Y-m-d');
                                 </div>
 
                                 <div class="card-body p-3 text-center d-flex flex-column">
-                                    <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                    <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;">
+                                        <i class="fas fa-tag me-1"></i><?php echo htmlspecialchars($p_row['daftar_kategori'] ?? 'Tanpa Kategori'); ?>
+                                    </small>
                                     <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
 
                                     <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">

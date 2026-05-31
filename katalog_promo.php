@@ -11,11 +11,14 @@ $is_admin  = ($is_login && $user_role === 'admin');
 
 // Query Khusus Promo: Hanya mengambil produk yang memiliki diskon aktif hari ini
 $today = date('Y-m-d');
-$sql_promo = "SELECT p.*, k.nama_kategori, pr.diskon_persen, pr.tgl_selesai 
+// PERBAIKAN QUERY: Menggunakan GROUP_CONCAT dan LEFT JOIN ke tabel produk_kategori agar mendukung multi-kategori
+$sql_promo = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen, pr.tgl_selesai 
               FROM produk p 
-              JOIN kategori k ON p.id_kategori = k.id_kategori
               JOIN promo pr ON p.id_produk = pr.id_produk 
+              LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+              LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori
               WHERE '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
+              GROUP BY p.id_produk
               ORDER BY pr.diskon_persen DESC";
 $result_promo = $koneksi->query($sql_promo);
 ?>
@@ -148,7 +151,7 @@ $result_promo = $koneksi->query($sql_promo);
                             </div>
 
                             <div class="card-body d-flex flex-column p-3">
-                                <span class="text-uppercase small mb-1 fw-semibold" style="color: var(--accent-plum);"><?php echo htmlspecialchars($row['nama_kategori'] ?? 'Umum'); ?></span>
+                                <span class="text-uppercase small mb-1 fw-semibold" style="color: var(--accent-plum);"><i class="fas fa-tag me-1"></i><?php echo htmlspecialchars($row['daftar_kategori'] ?? 'Umum'); ?></span>
                                 <h5 class="card-title fw-bold mb-2" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($row['nama_produk']); ?></h5>
 
                                 <div class="mb-3 p-3 rounded text-center" style="background-color: #FFF0F0; border: 1px dashed #D32F2F;">
@@ -299,7 +302,6 @@ $result_promo = $koneksi->query($sql_promo);
                 minimumFractionDigits: 0
             }).format(number);
 
-            // --- AJAX MODAL DETAIL ---
             const modalDetail = new bootstrap.Modal(document.getElementById('modalDetailProduk'));
             const kontainerIsi = document.getElementById('isiKontenModal');
             document.querySelectorAll('.btn-lihat-detail').forEach(button => {
@@ -314,7 +316,6 @@ $result_promo = $koneksi->query($sql_promo);
                 });
             });
 
-            // --- PERBAIKAN: LOGIKA BANDINGKAN (Sama Persis Seperti katalog.php) ---
             const checkboxes = document.querySelectorAll('.compare-checkbox');
             const floatingBtn = document.getElementById('compare-floating-btn');
             const compareCount = document.getElementById('compare-count');
@@ -324,8 +325,6 @@ $result_promo = $koneksi->query($sql_promo);
                 checkboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', function() {
                         const checkedCount = document.querySelectorAll('.compare-checkbox:checked').length;
-                        
-                        // Mendukung hingga 4 produk
                         if (checkedCount > 4) {
                             alert('Maksimal memilih 4 produk untuk dibandingkan secara bersamaan agar tampilan tetap rapi.');
                             this.checked = false;
@@ -339,15 +338,12 @@ $result_promo = $koneksi->query($sql_promo);
                 submitBtn.addEventListener('click', function() {
                     const checkedBoxes = document.querySelectorAll('.compare-checkbox:checked');
                     const ids = Array.from(checkedBoxes).map(cb => cb.value);
-
                     if (ids.length > 0) {
-                        // Menggabungkan semua ID menjadi satu string dipisah koma (contoh: ?ids=1,2,3)
                         window.location.href = 'bandingkan.php?ids=' + ids.join(',');
                     }
                 });
             }
 
-            // --- ORDER CEPAT ---
             const orderModal = document.getElementById('modalOrderCepat');
             if (orderModal) {
                 orderModal.addEventListener('show.bs.modal', function(event) {
