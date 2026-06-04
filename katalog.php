@@ -205,12 +205,10 @@ $result = $koneksi->query($sql);
                                     <span class="fw-bold fs-5" style="color: var(--accent-indigo);">Rp <?php echo number_format($row['harga'], 0, ',', '.'); ?></span>
                                 </div>
                                 
-                                <?php if (!$is_admin) : ?>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input compare-checkbox" type="checkbox" value="<?php echo $row['id_produk']; ?>" id="comp-<?php echo $row['id_produk']; ?>">
-                                        <label class="form-check-label small text-muted" for="comp-<?php echo $row['id_produk']; ?>">Bandingkan</label>
-                                    </div>
-                                <?php endif; ?>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input compare-checkbox" type="checkbox" value="<?php echo $row['id_produk']; ?>" id="comp-<?php echo $row['id_produk']; ?>">
+                                    <label class="form-check-label small text-muted" for="comp-<?php echo $row['id_produk']; ?>">Bandingkan</label>
+                                </div>
 
                                 <div class="d-grid mt-auto">
                                     <?php if ($is_sales) : ?>
@@ -261,7 +259,8 @@ $result = $koneksi->query($sql);
 
                             <input type="hidden" name="id_produk" id="input-id-produk">
                             <input type="hidden" name="harga_satuan" id="input-harga-satuan">
-                            <input type="hidden" id="input-db-stok"> <div class="mb-3">
+                            <input type="hidden" id="input-db-stok"> 
+                            <div class="mb-3">
                                 <label class="form-label fw-bold small text-muted">Nama Pelanggan / Reseller <span class="text-danger">*</span></label>
                                 <input type="text" name="nama_pelanggan" class="form-control py-2 shadow-sm" required>
                             </div>
@@ -315,13 +314,11 @@ $result = $koneksi->query($sql);
     </div>
 
 
-    <?php if (!$is_admin) : ?>
-        <div id="compare-floating-btn" class="position-fixed bottom-0 end-0 p-4" style="z-index: 1050; display: none;">
-            <button type="button" id="btn-submit-compare" class="btn shadow-lg fw-bold rounded-pill px-4 py-2 text-white" style="background-color: var(--accent-indigo);">
-                Bandingkan (<span id="compare-count">0</span>) <i class="fas fa-arrow-right ms-2"></i>
-            </button>
-        </div>
-    <?php endif; ?>
+    <div id="compare-floating-btn" class="position-fixed bottom-0 end-0 p-4" style="z-index: 1050; display: none;">
+        <button type="button" id="btn-submit-compare" class="btn shadow-lg fw-bold rounded-pill px-4 py-2 text-white" style="background-color: var(--accent-indigo);">
+            Bandingkan (<span id="compare-count">0</span>) <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+    </div>
 
 
     <footer class="py-5">
