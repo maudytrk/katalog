@@ -395,7 +395,7 @@ if ($res_chart) {
                             <div class="card panel-card h-100">
                                 <div class="panel-header">
                                     <i class="fas fa-clipboard-list me-2" style="color: var(--old-heliotrope);"></i>
-                                    5 Pesanan Masuk Terakhir
+                                    Pesanan Masuk Terakhir
                                 </div>
                                 <div class="card-body bg-white p-0">
                                     <div class="table-responsive">
