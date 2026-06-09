@@ -5,10 +5,14 @@ if (isset($_GET['id'])) {
     $id_produk = mysqli_real_escape_string($koneksi, $_GET['id']);
     $today = date('Y-m-d');
 
-    $query = "SELECT p.*, k.nama_kategori, pr.diskon_persen FROM produk p 
-              LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+    // PERBAIKAN: Gunakan GROUP_CONCAT dan JOIN ke produk_kategori (Sama seperti di katalog.php)
+    $query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
+              FROM produk p 
+              LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+              LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
               LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
-              WHERE p.id_produk = '$id_produk' LIMIT 1";
+              WHERE p.id_produk = '$id_produk'
+              GROUP BY p.id_produk LIMIT 1";
 
     $result = $koneksi->query($query);
 
@@ -96,7 +100,15 @@ if (isset($_GET['id'])) {
 
             <div class="col-md-7 d-flex flex-column justify-content-between p-3 p-md-4">
                 <div>
-                    <span class="badge mb-2" style="background-color: #6C4773;"><?php echo htmlspecialchars($row['nama_kategori'] ?? 'Tanpa Kategori'); ?></span>
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        <?php 
+                        $kategori_list = !empty($row['daftar_kategori']) ? explode(', ', $row['daftar_kategori']) : ['Tanpa Kategori'];
+                        foreach ($kategori_list as $kat) {
+                            echo '<span class="badge" style="background-color: #6C4773;">' . htmlspecialchars($kat) . '</span>';
+                        }
+                        ?>
+                    </div>
+                    
                     <h3 class="fw-bold mb-1" style="color: #241F48;"><?php echo htmlspecialchars($row['nama_produk']); ?></h3>
                     <p class="text-muted small mb-3">Kode Produk: <span class="fw-semibold"><?php echo htmlspecialchars($row['kode_produk'] ?? '-'); ?></span></p>
 
