@@ -14,33 +14,26 @@ if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
     // Proteksi SQL Injection menggunakan mysqli_real_escape_string
     $search_keyword = mysqli_real_escape_string($koneksi, trim($_GET['keyword']));
 
-    // Cari ID Order utama terlebih dahulu
-    $query_find_id = "SELECT id_order FROM orders WHERE id_order = '$search_keyword' OR nama_pelanggan LIKE '%$search_keyword%' ORDER BY tgl_pesan DESC LIMIT 1";
-    $result_find_id = $koneksi->query($query_find_id);
+    // PERBAIKAN: Hanya cari berdasarkan ID Order (strict match), hapus pencarian nama_pelanggan
+    $query_order = "SELECT * FROM orders WHERE id_order = '$search_keyword' LIMIT 1";
+    $result_order = $koneksi->query($query_order);
 
-    if ($result_find_id && $result_find_id->num_rows > 0) {
-        $row_id = $result_find_id->fetch_assoc();
-        $id_order_aktif = $row_id['id_order'];
+    if ($result_order && $result_order->num_rows > 0) {
+        $order_found = true;
+        $order_data = $result_order->fetch_assoc();
 
-        // Query 1: Ambil informasi nota induk
-        $query_order = "SELECT * FROM orders WHERE id_order = '$id_order_aktif' LIMIT 1";
-        $result_order = $koneksi->query($query_order);
+        $id_order_aktif = $order_data['id_order'];
 
-        if ($result_order && $result_order->num_rows > 0) {
-            $order_found = true;
-            $order_data = $result_order->fetch_assoc();
+        // Rincian semua produk melalui order_detail
+        $query_items = "SELECT od.*, p.nama_produk, p.kode_produk, k.nama_kategori 
+                        FROM order_detail od
+                        JOIN produk p ON od.id_produk = p.id_produk
+                        LEFT JOIN kategori k ON p.id_kategori = k.id_kategori
+                        WHERE od.id_order = '$id_order_aktif'";
+        $result_items = $koneksi->query($query_items);
 
-            // Rincian semua produk melalui order_detail
-            $query_items = "SELECT od.*, p.nama_produk, p.kode_produk, k.nama_kategori 
-                            FROM order_detail od
-                            JOIN produk p ON od.id_produk = p.id_produk
-                            LEFT JOIN kategori k ON p.id_kategori = k.id_kategori
-                            WHERE od.id_order = '$id_order_aktif'";
-            $result_items = $koneksi->query($query_items);
-
-            while ($item = $result_items->fetch_assoc()) {
-                $items_data[] = $item;
-            }
+        while ($item = $result_items->fetch_assoc()) {
+            $items_data[] = $item;
         }
     } else {
         $order_found = false;
@@ -163,7 +156,7 @@ if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
         <div class="text-center mb-5 mt-4">
             <span class="badge mb-2 px-3 py-2 rounded-pill shadow-sm" style="background-color: var(--accent-plum); color: white;">Fitur Pelacakan Publik</span>
             <h2 class="fw-bold" style="color: var(--accent-indigo);"><i class="fas fa-route text-muted me-2"></i>Lacak Status Pengiriman</h2>
-            <p class="text-muted mx-auto" style="max-width: 550px;">Inputkan Nomor ID Transaksi unik atau Nama Pelanggan untuk memantau proses pesanan Anda secara berkala.</p>
+            <p class="text-muted mx-auto" style="max-width: 550px;">Inputkan Nomor ID Transaksi untuk memantau status pesanan.</p>
         </div>
 
         <div class="row justify-content-center mb-5">
@@ -171,7 +164,7 @@ if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
                 <div class="card shadow border-0 p-2 rounded-pill bg-white">
                     <form method="GET" action="lacak_pesanan.php" class="d-flex align-items-center">
                         <span class="px-4 text-muted"><i class="fas fa-search"></i></span>
-                        <input type="text" name="keyword" class="form-control border-0 shadow-none py-3" placeholder="Ketik ID Order atau Nama Anda..." value="<?php echo htmlspecialchars($search_keyword); ?>" required style="background: transparent;">
+                        <input type="text" name="keyword" class="form-control border-0 shadow-none py-3" placeholder="Masukkan ID Order Anda..." value="<?php echo htmlspecialchars($search_keyword); ?>" required style="background: transparent;">
                         <button type="submit" class="btn btn-theme px-5 py-3 fw-bold rounded-pill"><i class="fas fa-paper-plane me-2"></i>Lacak</button>
                     </form>
                 </div>
@@ -324,7 +317,7 @@ if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
                         <i class="fas fa-search-minus fa-3x mb-3" style="color: var(--accent-gray);"></i>
                         <h4 class="fw-bold" style="color: var(--accent-indigo);">Data Tidak Ditemukan</h4>
                         <p class="text-muted mx-auto mt-2" style="max-width: 480px;">
-                            Pesanan dengan keyword "<strong style="color: var(--accent-plum);"><?php echo htmlspecialchars($search_keyword); ?></strong>" tidak terdaftar. Mohon periksa kembali kesesuaian ID atau ejaan nama Anda.
+                            Pesanan dengan ID "<strong style="color: var(--accent-plum);"><?php echo htmlspecialchars($search_keyword); ?></strong>" tidak terdaftar. Mohon periksa kembali kesesuaian ID Transaksi Anda.
                         </p>
                     </div>
                 </div>
