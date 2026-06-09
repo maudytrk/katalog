@@ -120,7 +120,7 @@ $today = date('Y-m-d');
     <header id="home" class="hero-section text-center">
         <div class="container position-relative" style="z-index: 2;">
             <span class="badge bg-light text-dark px-3 py-2 rounded-pill mb-3 shadow-sm fw-bold" style="letter-spacing: 2px;">EST. 2011</span>
-            <h1 class="display-4 fw-bolder mb-3 shadow-sm" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">Inner Wanita Berkualitas</h1>
+            <h1 class="display-4 fw-bolder mb-3 shadow-sm" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">Toko Rahayu</h1>
             <p class="lead fw-normal mb-5" style="color: var(--bg-lavender); text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Temukan sentuhan kenyamanan sempurna untuk aktivitas harian Anda</p>
             <a href="katalog.php" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold"><i class="bi bi-cart3 me-2"></i>Jelajahi Katalog</a>
         </div>
@@ -373,13 +373,13 @@ $today = date('Y-m-d');
             <div class="row">
                 <div id="about" class="col-md-6 mb-4 mb-md-0">
                     <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
                 </div>
                 <div id="contact" class="col-md-6 text-md-end">
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
-                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Jl. Raya Industri, Tasikmalaya<br>
-                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
+                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
+                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore.id@gmail.com<br>
                         <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
                     </p>
                 </div>

@@ -49,6 +49,8 @@ if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lacak Pesanan - Rahayu</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -330,13 +332,13 @@ if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
             <div class="row">
                 <div id="about" class="col-md-6 mb-4 mb-md-0">
                     <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
                 </div>
                 <div id="contact" class="col-md-6 text-md-end">
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
                         <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
+                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore.id@gmail.com<br>
                         <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
                     </p>
                 </div>
