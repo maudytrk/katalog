@@ -340,7 +340,7 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
                                     while ($row = $orders->fetch_assoc()):
                                     ?>
                                         <tr>
-                                            <td class="text-center fw-bold" style="color: var(--space-cadet);">#ORD-<?php echo $row['id_order']; ?></td>
+                                            <td class="text-center fw-bold" style="color: var(--space-cadet);">#<?php echo htmlspecialchars($row['id_order']); ?></td>
                                             <td><small class="fw-medium text-muted"><i class="far fa-calendar-alt me-1"></i><?php echo date('d/m/Y', strtotime($row['tgl_pesan'])); ?></small></td>
                                             <td class="fw-bold" style="color: var(--space-cadet);"><?php echo htmlspecialchars($row['nama_pelanggan']); ?></td>
                                             <td><span class="badge bg-light text-dark border px-2 py-1.5"><i class="fas fa-user-tag me-1 text-muted"></i><?php echo htmlspecialchars($row['nama_sales'] ?? 'Umum/Tanpa Sales'); ?></span></td>
@@ -359,13 +359,13 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
                                                 </span>
                                             </td>
                                             <td class="text-center">
-                                                <button class="btn btn-warning text-dark btn-sm fw-medium shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdate<?php echo $row['id_order']; ?>">
+                                                <button class="btn btn-warning text-dark btn-sm fw-medium shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdate<?php echo htmlspecialchars($row['id_order']); ?>">
                                                     <i class="fas fa-edit me-1"></i> Update
                                                 </button>
                                             </td>
                                         </tr>
 
-                                        <div class="modal fade" id="modalUpdate<?php echo $row['id_order']; ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal fade" id="modalUpdate<?php echo htmlspecialchars($row['id_order']); ?>" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-sm modal-dialog-centered">
                                                 <div class="modal-content shadow-lg border-0">
                                                     <form method="POST" action="orders.php">
@@ -374,10 +374,10 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body bg-white text-dark">
-                                                            <input type="hidden" name="id_order" value="<?php echo $row['id_order']; ?>">
+                                                            <input type="hidden" name="id_order" value="<?php echo htmlspecialchars($row['id_order']); ?>">
                                                             <div class="mb-2 text-center">
                                                                 <span class="small text-muted">ID Pesanan:</span>
-                                                                <strong class="d-block" style="color: var(--space-cadet);">#ORD-<?php echo $row['id_order']; ?></strong>
+                                                                <strong class="d-block" style="color: var(--space-cadet);">#<?php echo htmlspecialchars($row['id_order']); ?></strong>
                                                             </div>
                                                             <hr class="my-2 opacity-25">
                                                             <label class="form-label fw-semibold small mb-2" style="color: var(--space-cadet);">Pilih Status Baru:</label>
