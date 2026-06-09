@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start(); // Wajib untuk menangkap pesan sukses/gagal dari redirect
 include 'koneksi.php';
 
 // Proteksi halaman
@@ -8,8 +8,7 @@ if (!isset($_SESSION['login'])) {
     exit;
 }
 
-$sukses = "";
-$gagal  = "";
+// Catatan: Variabel $sukses dan $gagal lokal dihapus, beralih penuh ke $_SESSION
 
 // ==================== PROSES TAMBAH KATEGORI ====================
 if (isset($_POST['tambah_kategori'])) {
@@ -19,9 +18,15 @@ if (isset($_POST['tambah_kategori'])) {
     if (!empty($nama_kategori)) {
         $query = "INSERT INTO kategori (nama_kategori, keterangan) VALUES ('$nama_kategori', '$keterangan')";
         if ($koneksi->query($query)) {
-            $sukses = "Kategori baru berhasil ditambahkan!";
+            // Gunakan Session untuk notifikasi
+            $_SESSION['sukses'] = "Kategori <strong>$nama_kategori</strong> berhasil ditambahkan ke database master!";
+            // Redirect ke diri sendiri untuk membersihkan POST data (mencegah resubmit saat refresh)
+            header("Location: kategori.php");
+            exit;
         } else {
-            $gagal = "Gagal menambahkan kategori: " . $koneksi->error;
+            $_SESSION['gagal'] = "Gagal menambahkan kategori baru. Error: " . $koneksi->error;
+            header("Location: kategori.php");
+            exit;
         }
     }
 }
@@ -35,9 +40,13 @@ if (isset($_POST['edit_kategori'])) {
     if ($id_kategori > 0 && !empty($nama_kategori)) {
         $query = "UPDATE kategori SET nama_kategori = '$nama_kategori', keterangan = '$keterangan' WHERE id_kategori = $id_kategori";
         if ($koneksi->query($query)) {
-            $sukses = "Data kategori berhasil diperbarui!";
+            $_SESSION['sukses'] = "Perubahan data kategori <strong>$nama_kategori</strong> berhasil disimpan!";
+            header("Location: kategori.php");
+            exit;
         } else {
-            $gagal = "Gagal memperbarui kategori: " . $koneksi->error;
+            $_SESSION['gagal'] = "Gagal memperbarui data kategori. Error: " . $koneksi->error;
+            header("Location: kategori.php");
+            exit;
         }
     }
 }
@@ -46,27 +55,33 @@ if (isset($_POST['edit_kategori'])) {
 if (isset($_GET['hapus'])) {
     $id_hapus = (int)$_GET['hapus'];
     if ($id_hapus > 0) {
+        // Ambil nama kategori dulu untuk notifikasi yang lebih personal
+        $data_kat = $koneksi->query("SELECT nama_kategori FROM kategori WHERE id_kategori = $id_hapus")->fetch_assoc();
+        $nm_hapus = htmlspecialchars($data_kat['nama_kategori']);
+
         // Cek apakah ada produk yang terikat ke kategori ini sebelum menghapus
         $cek_produk = $koneksi->query("SELECT COUNT(*) as total FROM produk WHERE id_kategori = $id_hapus")->fetch_assoc();
         if ($cek_produk['total'] > 0) {
-            $gagal = "Kategori tidak dapat dihapus karena masih digunakan oleh " . $cek_produk['total'] . " produk!";
+            $_SESSION['gagal'] = "Kategori <strong>$nm_hapus</strong> tidak dapat dihapus karena masih digunakan oleh " . $cek_produk['total'] . " produk! Silakan pindahkan atau hapus produknya terlebih dahulu.";
+            header("Location: kategori.php");
+            exit;
         } else {
             $query = "DELETE FROM kategori WHERE id_kategori = $id_hapus";
             if ($koneksi->query($query)) {
-                // Dialihkan kembali ke kategori.php untuk menghindari resubmit / bug datatable client-side
-                header("Location: kategori.php?msg=sukses_hapus");
+                // Notifikasi sukses hapus via session
+                $_SESSION['sukses'] = "Kategori <strong>$nm_hapus</strong> berhasil dihapus permanen dari sistem.";
+                header("Location: kategori.php");
                 exit;
             } else {
-                $gagal = "Gagal menghapus kategori: " . $koneksi->error;
+                $_SESSION['gagal'] = "Gagal menghapus kategori. Error: " . $koneksi->error;
+                header("Location: kategori.php");
+                exit;
             }
         }
     }
 }
 
-// Menangkap feedback redirect hapus
-if (isset($_GET['msg']) && $_GET['msg'] == 'sukses_hapus') {
-    $sukses = "Kategori berhasil dihapus dari database!";
-}
+// Mengangkap feedback redirect hapus lama dihapus, sudah dicover oleh $_SESSION['sukses'] di blok hapus
 
 // Fungsi bantu sanitasi input database
 function mysqli_real_escape_with_html_tags($koneksi, $data)
@@ -282,20 +297,6 @@ function mysqli_real_escape_with_html_tags($koneksi, $data)
                         </div>
                     </div>
 
-                    <?php if (!empty($sukses)): ?>
-                        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                            <i class="fas fa-check-circle me-2"></i><?php echo $sukses; ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($gagal)): ?>
-                        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i><?php echo $gagal; ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    <?php endif; ?>
-
                     <div class="card panel-card mb-4">
                         <div class="panel-header d-flex justify-content-between align-items-center">
                             <div><i class="fas fa-table me-1"></i> List Master Kategori Produk</div>
@@ -361,8 +362,8 @@ function mysqli_real_escape_with_html_tags($koneksi, $data)
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer bg-light">
-                                                            <button type="button" class="btn btn-sm btn-secondary rounded px-3" data-bs-dismiss="modal">Batal</button>
-                                                            <button type="submit" name="edit_kategori" class="btn btn-sm btn-custom-primary rounded px-4 fw-bold">Simpan Perubahan</button>
+                                                            <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" name="edit_kategori" class="btn btn-custom-primary px-4 fw-bold shadow-sm">Simpan Perubahan</button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -405,8 +406,8 @@ function mysqli_real_escape_with_html_tags($koneksi, $data)
                         </div>
                     </div>
                     <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-sm btn-secondary rounded px-3" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" name="tambah_kategori" class="btn btn-sm btn-custom-primary rounded px-4 fw-bold">Tambah Data</button>
+                        <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" name="tambah_kategori" class="btn btn-custom-primary px-4 fw-bold shadow-sm">Tambah Data</button>
                     </div>
                 </form>
             </div>
@@ -415,6 +416,8 @@ function mysqli_real_escape_with_html_tags($koneksi, $data)
 
     <?php include 'modal_logout.php'; ?>
     <?php include 'modal_konfirmasi_hapus.php'; ?>
+    
+    <?php include 'modal_notifikasi.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>

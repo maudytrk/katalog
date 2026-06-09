@@ -23,9 +23,13 @@ if (isset($_POST['simpan_akun'])) {
         $query = "INSERT INTO users (username, password, nama_lengkap, role, created_at) 
                   VALUES ('$username', '$password_hashed', '$nama_lengkap', '$role', NOW())";
         if ($koneksi->query($query)) {
-            echo "<script>alert('Akun baru berhasil ditambahkan!'); window.location='kelola_admin.php';</script>";
+            $_SESSION['sukses'] = "Akun baru berhasil ditambahkan ke sistem!";
+            header("Location: kelola_admin.php");
+            exit;
         } else {
-            echo "<script>alert('Gagal menambah akun: " . $koneksi->error . "');</script>";
+            $_SESSION['gagal'] = "Gagal menambah akun: " . $koneksi->error;
+            header("Location: kelola_admin.php");
+            exit;
         }
     } else {
         // --- PROSES EDIT (UPDATE) ---
@@ -38,9 +42,13 @@ if (isset($_POST['simpan_akun'])) {
         }
 
         if ($koneksi->query($query)) {
-            echo "<script>alert('Data akun berhasil diperbarui!'); window.location='kelola_admin.php';</script>";
+            $_SESSION['sukses'] = "Data akun berhasil diperbarui!";
+            header("Location: kelola_admin.php");
+            exit;
         } else {
-            echo "<script>alert('Gagal memperbarui akun: " . $koneksi->error . "');</script>";
+            $_SESSION['gagal'] = "Gagal memperbarui akun: " . $koneksi->error;
+            header("Location: kelola_admin.php");
+            exit;
         }
     }
 }
@@ -51,15 +59,20 @@ if (isset($_GET['hapus'])) {
 
     // Mencegah admin menghapus dirinya sendiri yang sedang login
     if (isset($_SESSION['user_id']) && $id_hapus == $_SESSION['user_id']) {
-        echo "<script>alert('Anda tidak bisa menghapus akun Anda sendiri yang sedang aktif!'); window.location='kelola_admin.php';</script>";
+        $_SESSION['gagal'] = "Anda tidak bisa menghapus akun Anda sendiri yang sedang aktif!";
+        header("Location: kelola_admin.php");
         exit;
     }
 
     $query = "DELETE FROM users WHERE id_user = '$id_hapus'";
     if ($koneksi->query($query)) {
-        echo "<script>alert('Akun berhasil dihapus!'); window.location='kelola_admin.php';</script>";
+        $_SESSION['sukses'] = "Akun berhasil dihapus dari sistem secara permanen!";
+        header("Location: kelola_admin.php");
+        exit;
     } else {
-        echo "<script>alert('Gagal menghapus akun: " . $koneksi->error . "');</script>";
+        $_SESSION['gagal'] = "Gagal menghapus akun: " . $koneksi->error;
+        header("Location: kelola_admin.php");
+        exit;
     }
 }
 ?>
@@ -418,6 +431,8 @@ if (isset($_GET['hapus'])) {
     </div>
 
     <?php include 'modal_logout.php'; ?>
+    
+    <?php include 'modal_notifikasi.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
