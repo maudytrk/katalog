@@ -380,7 +380,6 @@ function mysqli_real_escape_with_html_tags($koneksi, $data)
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted fw-medium">PT Rahayu Karunia Utama &copy; <?php echo date('Y'); ?> E-Catalogue</div>
-                        <div><span class="text-muted">Designed for Rahayu</span></div>
                     </div>
                 </div>
             </footer>
@@ -416,7 +415,7 @@ function mysqli_real_escape_with_html_tags($koneksi, $data)
 
     <?php include 'modal_logout.php'; ?>
     <?php include 'modal_konfirmasi_hapus.php'; ?>
-    
+
     <?php include 'modal_notifikasi.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

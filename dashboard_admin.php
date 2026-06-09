@@ -453,9 +453,7 @@ if ($res_chart) {
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted fw-medium">PT Rahayu Karunia Utama &copy; <?php echo date('Y'); ?> E-Catalogue</div>
-                        <div>
-                            <span class="text-muted">Designed for Rahayu</span>
-                        </div>
+
                     </div>
                 </div>
             </footer>

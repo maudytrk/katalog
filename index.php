@@ -120,7 +120,7 @@ $today = date('Y-m-d');
     <header id="home" class="hero-section text-center">
         <div class="container position-relative" style="z-index: 2;">
             <span class="badge bg-light text-dark px-3 py-2 rounded-pill mb-3 shadow-sm fw-bold" style="letter-spacing: 2px;">EST. 2011</span>
-            <h1 class="display-4 fw-bolder mb-3 shadow-sm" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">Inner Wanita Berkualitas</h1>
+            <h1 class="display-4 fw-bolder mb-3 shadow-sm" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">Rahayu Katalog</h1>
             <p class="lead fw-normal mb-5" style="color: var(--bg-lavender); text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Temukan sentuhan kenyamanan sempurna untuk aktivitas harian Anda</p>
             <a href="katalog.php" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold"><i class="bi bi-cart3 me-2"></i>Jelajahi Katalog</a>
         </div>
