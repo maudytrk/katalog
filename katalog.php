@@ -48,7 +48,7 @@ $result = $koneksi->query($sql);
     <title>Katalog Produk - PT Rahayu Karunia Utama</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --bg-lavender: #E0E1F6;
@@ -95,7 +95,8 @@ $result = $koneksi->query($sql);
             transition: all 0.3s;
         }
 
-        .filter-btn.active, .filter-btn:hover {
+        .filter-btn.active,
+        .filter-btn:hover {
             background-color: var(--accent-indigo);
             color: white;
             border-color: var(--accent-indigo);
@@ -189,7 +190,7 @@ $result = $koneksi->query($sql);
                 <?php while ($row = $result->fetch_assoc()) : ?>
                     <div class="col">
                         <div class="card h-100 product-card shadow-sm rounded-3 overflow-hidden">
-                            
+
                             <div class="card-img-container">
                                 <img src="assets/img/<?php echo !empty($row['foto']) ? htmlspecialchars($row['foto']) : 'no-image.jpg'; ?>" class="card-img-top">
                             </div>
@@ -198,13 +199,13 @@ $result = $koneksi->query($sql);
                                 <span class="text-uppercase small mb-1 fw-semibold" style="color: var(--accent-plum);">
                                     <i class="fas fa-tag me-1"></i><?php echo htmlspecialchars($row['daftar_kategori'] ?? 'Umum'); ?>
                                 </span>
-                                
+
                                 <h5 class="card-title fw-bold mb-2" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($row['nama_produk']); ?></h5>
-                                
+
                                 <div class="mb-3 p-2 rounded" style="background-color: var(--soft-cream); border-left: 3px solid var(--accent-plum);">
                                     <span class="fw-bold fs-5" style="color: var(--accent-indigo);">Rp <?php echo number_format($row['harga'], 0, ',', '.'); ?></span>
                                 </div>
-                                
+
                                 <div class="form-check mb-3">
                                     <input class="form-check-input compare-checkbox" type="checkbox" value="<?php echo $row['id_produk']; ?>" id="comp-<?php echo $row['id_produk']; ?>">
                                     <label class="form-check-label small text-muted" for="comp-<?php echo $row['id_produk']; ?>">Bandingkan</label>
@@ -212,11 +213,11 @@ $result = $koneksi->query($sql);
 
                                 <div class="d-grid mt-auto">
                                     <?php if ($is_sales) : ?>
-                                        <button type="button" class="btn fw-bold mb-2 rounded-pill text-white btn-order-cepat shadow-sm" 
-                                                style="background-color: #27ae60;"
-                                                data-bs-toggle="modal" data-bs-target="#modalOrderCepat"
-                                                data-id="<?= $row['id_produk']; ?>" data-nama="<?= htmlspecialchars($row['nama_produk']); ?>" 
-                                                data-harga="<?= $row['harga']; ?>" data-stok="<?= $row['stok']; ?>">
+                                        <button type="button" class="btn fw-bold mb-2 rounded-pill text-white btn-order-cepat shadow-sm"
+                                            style="background-color: #27ae60;"
+                                            data-bs-toggle="modal" data-bs-target="#modalOrderCepat"
+                                            data-id="<?= $row['id_produk']; ?>" data-nama="<?= htmlspecialchars($row['nama_produk']); ?>"
+                                            data-harga="<?= $row['harga']; ?>" data-stok="<?= $row['stok']; ?>">
                                             <i class="fas fa-bolt me-1"></i> Pesanan Cepat
                                         </button>
                                     <?php endif; ?>
@@ -247,7 +248,7 @@ $result = $koneksi->query($sql);
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body p-4 text-start">
-                            
+
                             <div class="mb-4 p-3 rounded" style="background-color: var(--soft-cream); border-left: 4px solid var(--accent-plum);">
                                 <small class="d-block text-muted">Produk yang Dipilih:</small>
                                 <h6 class="fw-bold mb-1" style="color: var(--accent-indigo);" id="display-nama-produk">Nama Produk</h6>
@@ -259,7 +260,7 @@ $result = $koneksi->query($sql);
 
                             <input type="hidden" name="id_produk" id="input-id-produk">
                             <input type="hidden" name="harga_satuan" id="input-harga-satuan">
-                            <input type="hidden" id="input-db-stok"> 
+                            <input type="hidden" id="input-db-stok">
                             <div class="mb-3">
                                 <label class="form-label fw-bold small text-muted">Nama Pelanggan / Reseller <span class="text-danger">*</span></label>
                                 <input type="text" name="nama_pelanggan" class="form-control py-2 shadow-sm" required>
@@ -280,7 +281,7 @@ $result = $koneksi->query($sql);
                                 <span class="fw-semibold text-muted">Total Bayar:</span>
                                 <h4 class="fw-bold mb-0" style="color: var(--accent-indigo);" id="display-total-bayar">Rp 0</h4>
                             </div>
-                            
+
                             <div id="error-msg-order" class="text-danger small fw-bold mt-2 text-center" style="display: none;">
                                 <i class="fas fa-exclamation-triangle me-1"></i> Jumlah melebihi stok!
                             </div>
@@ -326,13 +327,13 @@ $result = $koneksi->query($sql);
             <div class="row">
                 <div id="about" class="col-md-6 mb-4 mb-md-0">
                     <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011.</p>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
                 </div>
                 <div id="contact" class="col-md-6 text-md-end">
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
                         <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
+                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore.id@gmail.com<br>
                         <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
                     </p>
                 </div>
@@ -347,9 +348,13 @@ $result = $koneksi->query($sql);
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            
+
             const formatRupiah = (number) => {
-                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(number);
             };
 
             // --- AJAX UNTUK MODAL DETAIL ---
@@ -383,7 +388,7 @@ $result = $koneksi->query($sql);
                 checkboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', function() {
                         const checkedCount = document.querySelectorAll('.compare-checkbox:checked').length;
-                        
+
                         if (checkedCount > 4) {
                             alert('Maksimal memilih 4 produk untuk dibandingkan secara bersamaan agar tampilan tetap rapi.');
                             this.checked = false;
@@ -414,18 +419,18 @@ $result = $koneksi->query($sql);
             if (orderModal) {
                 orderModal.addEventListener('show.bs.modal', function(event) {
                     const button = event.relatedTarget;
-                    
+
                     const stok = parseInt(button.getAttribute('data-stok'));
                     const harga = parseFloat(button.getAttribute('data-harga'));
 
                     document.getElementById('input-id-produk').value = button.getAttribute('data-id');
                     document.getElementById('input-harga-satuan').value = harga;
                     document.getElementById('input-db-stok').value = stok;
-                    
+
                     document.getElementById('display-nama-produk').textContent = button.getAttribute('data-nama');
                     document.getElementById('display-harga-satuan').textContent = formatRupiah(harga);
                     document.getElementById('display-stok').textContent = 'Sisa Stok: ' + stok + ' Pcs';
-                    
+
                     document.getElementById('display-total-bayar').textContent = formatRupiah(harga);
                     document.getElementById('input-qty').max = stok;
                     document.getElementById('input-qty').value = 1;
@@ -433,7 +438,7 @@ $result = $koneksi->query($sql);
                     document.getElementById('btn-submit-order').disabled = (stok <= 0);
                     document.getElementById('error-msg-order').style.display = 'none';
                 });
-                
+
                 document.getElementById('input-qty').addEventListener('input', function() {
                     let qty = parseInt(this.value) || 0;
                     const maxStok = parseInt(document.getElementById('input-db-stok').value);
