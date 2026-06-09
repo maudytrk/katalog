@@ -160,11 +160,13 @@ $today = date('Y-m-d');
         </section>
 
         <?php
-        $promo_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+        $promo_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                         FROM produk p 
-                        LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                        LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+                        LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
                         JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
                         WHERE pr.diskon_persen > 0
+                        GROUP BY p.id_produk
                         ORDER BY p.id_produk DESC LIMIT 4";
         $promo_result = $koneksi->query($promo_query);
 
@@ -195,7 +197,7 @@ $today = date('Y-m-d');
                                         <img class="card-img-top w-100 h-100" style="object-fit: cover;" src="assets/img/<?php echo !empty($p_row['foto']) ? htmlspecialchars($p_row['foto']) : 'no-image.jpg'; ?>" alt="Foto Produk" />
                                     </div>
                                     <div class="card-body p-3 text-center d-flex flex-column">
-                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['daftar_kategori'] ?? 'Tanpa Kategori'); ?></small>
                                         <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
                                         <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
                                             <span class="text-muted text-decoration-line-through small d-block">Rp <?php echo number_format($p_row['harga'], 0, ',', '.'); ?></span>
@@ -214,10 +216,12 @@ $today = date('Y-m-d');
         <?php endif; ?>
 
         <?php
-        $terbaru_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+        $terbaru_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                           FROM produk p 
-                          LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                          LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+                          LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
                           LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
+                          GROUP BY p.id_produk
                           ORDER BY p.id_produk DESC LIMIT 4";
         $terbaru_result = $koneksi->query($terbaru_query);
 
@@ -254,7 +258,7 @@ $today = date('Y-m-d');
                                         <img class="card-img-top w-100 h-100" style="object-fit: cover;" src="assets/img/<?php echo !empty($p_row['foto']) ? htmlspecialchars($p_row['foto']) : 'no-image.jpg'; ?>" alt="Foto Produk" />
                                     </div>
                                     <div class="card-body p-3 text-center d-flex flex-column">
-                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                        <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['daftar_kategori'] ?? 'Tanpa Kategori'); ?></small>
                                         <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
                                         <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
                                             <?php if ($has_promo):
@@ -298,17 +302,21 @@ $today = date('Y-m-d');
 
                 if (isset($_GET['search']) && $_GET['search'] != '') {
                     $search = mysqli_real_escape_string($koneksi, $_GET['search']);
-                    $populer_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+                    $populer_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                                       FROM produk p 
-                                      LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                                      LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+                                      LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
                                       LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
                                       WHERE p.nama_produk LIKE '%$search%' OR p.deskripsi LIKE '%$search%'
+                                      GROUP BY p.id_produk
                                       ORDER BY p.jumlah_klik DESC LIMIT 10";
                 } else {
-                    $populer_query = "SELECT p.*, k.nama_kategori, pr.diskon_persen 
+                    $populer_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                                       FROM produk p 
-                                      LEFT JOIN kategori k ON p.id_kategori = k.id_kategori 
+                                      LEFT JOIN produk_kategori pk ON p.id_produk = pk.id_produk
+                                      LEFT JOIN kategori k ON pk.id_kategori = k.id_kategori 
                                       LEFT JOIN promo pr ON p.id_produk = pr.id_produk AND '$today' BETWEEN pr.tgl_mulai AND pr.tgl_selesai
+                                      GROUP BY p.id_produk
                                       ORDER BY p.jumlah_klik DESC LIMIT 10";
                 }
 
@@ -339,7 +347,7 @@ $today = date('Y-m-d');
                                 </div>
 
                                 <div class="card-body p-3 text-center d-flex flex-column">
-                                    <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['nama_kategori'] ?? 'Tanpa Kategori'); ?></small>
+                                    <small class="d-block mb-2 fw-bold text-uppercase" style="color: var(--accent-plum); letter-spacing: 1px; font-size: 0.7rem;"><?php echo htmlspecialchars($p_row['daftar_kategori'] ?? 'Tanpa Kategori'); ?></small>
                                     <h6 class="fw-bold text-truncate mb-auto" style="color: var(--accent-indigo);"><?php echo htmlspecialchars($p_row['nama_produk']); ?></h6>
 
                                     <div class="product-price mt-3 p-2 rounded" style="background-color: var(--soft-cream); border: 1px dashed var(--accent-gray);">
