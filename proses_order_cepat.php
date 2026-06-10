@@ -2,27 +2,35 @@
 session_start();
 include 'koneksi.php';
 
+// Atur header agar aplikasi mengenali output sebagai JSON
+header('Content-Type: application/json');
+
 // 1. Proteksi Hak Akses (Hanya boleh diakses oleh sales)
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'sales') {
-    die("Akses ditolak! Halaman ini hanya untuk Tim Sales.");
+    echo json_encode(['status' => 'error', 'message' => 'Akses ditolak! Halaman ini hanya untuk Tim Sales.']);
+    exit;
 }
 
-if (isset($_POST['submit_order_cepat'])) {
-    
+// Menerima aliran data JSON dari Fetch API PWA
+$inputJSON = file_get_contents('php://input');
+$data = json_decode($inputJSON, TRUE);
+
+if ($data) {
+
     // AKTIFKAN REPORT EXCEPTION MYSQLI (Penting agar try-catch berfungsi pada MySQLi)
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    // 2. Ambil data input (Menggunakan 'user_id' disesuaikan dengan file riwayat_sales.php)
-    $id_user        = mysqli_real_escape_string($koneksi, $_SESSION['user_id']); 
-    $id_produk      = (int)$_POST['id_produk'];
-    $harga_satuan   = (float)$_POST['harga_satuan'];
-    $nama_pelanggan = mysqli_real_escape_string($koneksi, trim($_POST['nama_pelanggan']));
-    $no_hp          = mysqli_real_escape_string($koneksi, trim($_POST['no_hp']));
-    $jumlah_beli    = (int)$_POST['jumlah_beli'];
+    // 2. Ambil data input dari objek JSON (Menggunakan 'user_id' disesuaikan dengan file riwayat_sales.php)
+    $id_user        = mysqli_real_escape_string($koneksi, $_SESSION['user_id']);
+    $id_produk      = (int)$data['id_produk'];
+    $harga_satuan   = (float)$data['harga_satuan'];
+    $nama_pelanggan = mysqli_real_escape_string($koneksi, trim($data['nama_pelanggan']));
+    $no_hp          = mysqli_real_escape_string($koneksi, trim($data['no_hp']));
+    $jumlah_beli    = (int)$data['jumlah_beli'];
 
     // Validasi input dasar untuk mencegah angka minus atau nol
     if ($jumlah_beli <= 0) {
-        echo "<script>alert('Gagal! Jumlah beli tidak valid.'); window.location='katalog.php';</script>";
+        echo json_encode(['status' => 'error', 'message' => 'Gagal! Jumlah beli tidak valid.']);
         exit;
     }
 
@@ -68,24 +76,29 @@ if (isset($_POST['submit_order_cepat'])) {
 
         // Jika semua sukses, commit data
         $koneksi->commit();
-        
-        // Tampilkan ID order ke Sales agar bisa diberikan ke pelanggan untuk pelacakan
-        echo "<script>alert('Transaksi Berhasil! ID Order Pelanggan: $id_order_baru'); window.location='katalog.php';</script>";
 
+        // Kembalikan respons berhasil dalam format JSON
+        echo json_encode([
+            'status' => 'success',
+            'message' => "Transaksi Berhasil! ID Order Pelanggan: $id_order_baru",
+            'id_order' => $id_order_baru
+        ]);
+        exit;
     } catch (Exception $e) {
         // Jika ada query yang gagal atau stok tidak cukup, batalkan semua manipulasi data
         $koneksi->rollback();
         $pesan_error = $e->getMessage();
-        
+
         // Memisahkan pesan error karena stok/produk dengan pesan error query database
         if ($pesan_error == "Produk tidak ditemukan." || $pesan_error == "Jumlah beli melebihi ketersediaan stok terbaru.") {
-            echo "<script>alert('Gagal Simpan! $pesan_error'); window.location='katalog.php';</script>";
+            echo json_encode(['status' => 'error', 'message' => "Gagal Simpan! $pesan_error"]);
         } else {
-            echo "<script>alert('Terjadi kesalahan sistem, transaksi gagal diproses.'); window.location='katalog.php';</script>";
+            echo json_encode(['status' => 'error', 'message' => "Terjadi kesalahan sistem, transaksi gagal diproses."]);
         }
+        exit;
     }
 } else {
-    header("Location: katalog.php");
+    // Menangani akses langsung ke URL tanpa data JSON
+    echo json_encode(['status' => 'error', 'message' => 'Permintaan tidak valid.']);
     exit;
 }
-?>

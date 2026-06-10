@@ -80,18 +80,18 @@ if (isset($_POST['update'])) {
     if (isset($_FILES['foto_baru']['name']) && is_array($_FILES['foto_baru']['name'])) {
         $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp');
         $total_files = count($_FILES['foto_baru']['name']);
-        
+
         for ($i = 0; $i < $total_files; $i++) {
             if ($_FILES['foto_baru']['error'][$i] === UPLOAD_ERR_OK) {
                 $nama_file = $_FILES['foto_baru']['name'][$i];
                 $tmp_name = $_FILES['foto_baru']['tmp_name'][$i];
-                
+
                 $x = explode('.', $nama_file);
                 $ekstensi = strtolower(end($x));
 
                 if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
                     $nama_foto_baru = date('YmdHis') . '-' . rand(1000, 9999) . '.' . $ekstensi;
-                    
+
                     if (move_uploaded_file($tmp_name, 'assets/img/' . $nama_foto_baru)) {
                         $koneksi->query("INSERT INTO produk_foto (id_produk, nama_file) VALUES ('$id_edit', '$nama_foto_baru')");
 
@@ -116,6 +116,7 @@ if (isset($_POST['update'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Kelola Produk - Admin</title>
+    <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -134,42 +135,185 @@ if (isset($_POST['update'])) {
             --accent-olive: #7D8F37;
         }
 
-        body { background-color: var(--bg-cream); color: var(--space-cadet); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar-admin-custom { background-color: var(--space-cadet) !important; border-bottom: 3px solid var(--old-heliotrope); }
-        .navbar-admin-custom .navbar-brand { color: #fff !important; font-weight: 700; letter-spacing: 1px; }
+        body {
+            background-color: var(--bg-cream);
+            color: var(--space-cadet);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        .sb-sidenav-dark { background-color: #1a1736 !important; color: rgba(255, 255, 255, 0.7) !important; }
-        .sb-sidenav-dark .sb-sidenav-menu-heading { color: var(--lavender-mist) !important; font-weight: 600; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
-        .sb-sidenav-dark .nav-link { color: rgba(255, 255, 255, 0.8) !important; transition: all 0.3s; }
-        .sb-sidenav-dark .nav-link .sb-nav-link-icon { color: var(--lavender-mist) !important; }
-        .sb-sidenav-dark .nav-link.active { color: #fff !important; background-color: var(--old-heliotrope) !important; border-radius: 0 25px 25px 0; margin-right: 15px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); }
-        .sb-sidenav-dark .nav-link:hover:not(.active) { color: #fff !important; background-color: rgba(107, 71, 115, 0.3) !important; border-radius: 0 25px 25px 0; margin-right: 15px; }
-        .sb-sidenav-footer { background-color: #121026 !important; color: var(--lavender-mist) !important; }
+        .navbar-admin-custom {
+            background-color: var(--space-cadet) !important;
+            border-bottom: 3px solid var(--old-heliotrope);
+        }
 
-        .panel-card { border: none; border-radius: 12px; box-shadow: 0 5px 15px rgba(35, 31, 72, 0.04); overflow: hidden; }
-        .panel-header { background-color: var(--lavender-mist); color: var(--space-cadet); font-weight: 700; border-bottom: 2px solid #DCD6EA; padding: 15px 20px; }
-        .table>thead { background-color: var(--space-cadet); color: white; }
+        .navbar-admin-custom .navbar-brand {
+            color: #fff !important;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
 
-        .btn-custom-primary { background-color: var(--old-heliotrope); color: white; border: none; }
-        .btn-custom-primary:hover { background-color: var(--tyrian-purple); color: white; }
-        .btn-update { background-color: var(--space-cadet); color: white; border: none; }
-        .btn-update:hover { background-color: #1a1736; color: white; }
-        
-        .modal-header-custom { background-color: var(--space-cadet); color: white; border-bottom: 3px solid var(--old-heliotrope); }
-        .modal-header-edit { background-color: var(--old-heliotrope); color: white; border-bottom: 3px solid var(--royal-fuchsia); }
-        
-        footer.bg-light { background-color: #ffffff !important; border-top: 1px solid var(--lavender-mist); }
+        .sb-sidenav-dark {
+            background-color: #1a1736 !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .sb-sidenav-dark .sb-sidenav-menu-heading {
+            color: var(--lavender-mist) !important;
+            font-weight: 600;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sb-sidenav-dark .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s;
+        }
+
+        .sb-sidenav-dark .nav-link .sb-nav-link-icon {
+            color: var(--lavender-mist) !important;
+        }
+
+        .sb-sidenav-dark .nav-link.active {
+            color: #fff !important;
+            background-color: var(--old-heliotrope) !important;
+            border-radius: 0 25px 25px 0;
+            margin-right: 15px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sb-sidenav-dark .nav-link:hover:not(.active) {
+            color: #fff !important;
+            background-color: rgba(107, 71, 115, 0.3) !important;
+            border-radius: 0 25px 25px 0;
+            margin-right: 15px;
+        }
+
+        .sb-sidenav-footer {
+            background-color: #121026 !important;
+            color: var(--lavender-mist) !important;
+        }
+
+        .panel-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(35, 31, 72, 0.04);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: var(--lavender-mist);
+            color: var(--space-cadet);
+            font-weight: 700;
+            border-bottom: 2px solid #DCD6EA;
+            padding: 15px 20px;
+        }
+
+        .table>thead {
+            background-color: var(--space-cadet);
+            color: white;
+        }
+
+        .btn-custom-primary {
+            background-color: var(--old-heliotrope);
+            color: white;
+            border: none;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: var(--tyrian-purple);
+            color: white;
+        }
+
+        .btn-update {
+            background-color: var(--space-cadet);
+            color: white;
+            border: none;
+        }
+
+        .btn-update:hover {
+            background-color: #1a1736;
+            color: white;
+        }
+
+        .modal-header-custom {
+            background-color: var(--space-cadet);
+            color: white;
+            border-bottom: 3px solid var(--old-heliotrope);
+        }
+
+        .modal-header-edit {
+            background-color: var(--old-heliotrope);
+            color: white;
+            border-bottom: 3px solid var(--royal-fuchsia);
+        }
+
+        footer.bg-light {
+            background-color: #ffffff !important;
+            border-top: 1px solid var(--lavender-mist);
+        }
 
         /* Custom untuk memperbaiki tampilan border library Choices agar match dengan Bootstrap */
-        .choices__inner { border-radius: 0.375rem !important; border: 1px solid #ced4da !important; background-color: #fff !important; padding: 4.5px 7.5px !important; min-height: 38px !important;}
-        .choices[data-type*="select-multiple"] .choices__button { border-left: 1px solid rgba(255,255,255,0.5); }
-        .choices__list--multiple .choices__item { background-color: var(--old-heliotrope) !important; border: none !important; border-radius: 4px; }
+        .choices__inner {
+            border-radius: 0.375rem !important;
+            border: 1px solid #ced4da !important;
+            background-color: #fff !important;
+            padding: 4.5px 7.5px !important;
+            min-height: 38px !important;
+        }
+
+        .choices[data-type*="select-multiple"] .choices__button {
+            border-left: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .choices__list--multiple .choices__item {
+            background-color: var(--old-heliotrope) !important;
+            border: none !important;
+            border-radius: 4px;
+        }
 
         /* PREVIEW FOTO CSS */
-        .preview-wrapper { position: relative; width: 80px; height: 80px; margin-right: 8px; margin-bottom: 8px; }
-        .preview-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 2px solid #E0E1F6; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .preview-remove-btn { position: absolute; top: -7px; right: -7px; background: #FF4444; color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 14px; line-height: 20px; text-align: center; cursor: pointer; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid white; transition: all 0.2s; z-index: 10; }
-        .preview-remove-btn:hover { background: #CC0000; transform: scale(1.1); }
+        .preview-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .preview-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #E0E1F6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-remove-btn {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            background: #FF4444;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 14px;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            border: 2px solid white;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .preview-remove-btn:hover {
+            background: #CC0000;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
@@ -365,7 +509,7 @@ if (isset($_POST['update'])) {
                                 <div class="mb-2"><input type="url" name="link_tiktok" class="form-control form-control-sm" placeholder="https://tiktok.com/..."></div>
                                 <div class="mb-2"><input type="url" name="link_shopee" class="form-control form-control-sm" placeholder="https://shopee.co.id/..."></div>
                                 <div class="mb-3"><input type="url" name="link_lazada" class="form-control form-control-sm" placeholder="https://lazada.co.id/..."></div>
-                                
+
                                 <div class="mb-3 p-3 rounded" style="background-color: #F8F9FA; border: 1px dashed #B0B7CA;">
                                     <label class="form-label fw-semibold" style="color: var(--space-cadet);"><i class="fas fa-images me-1"></i> Foto Produk</label>
                                     <input type="file" name="foto[]" id="fotoInputTambah" class="form-control" accept="image/*" multiple required>
@@ -421,7 +565,7 @@ if (isset($_POST['update'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
-    
+
     <script>
         let choicesTambahInstance;
 
@@ -433,7 +577,7 @@ if (isset($_POST['update'])) {
 
             // Inisialisasi Combo Box untuk Form Tambah (KOSONGKAN itemSelectText)
             const elKategoriTambah = document.getElementById('kategoriSelectTambah');
-            if(elKategoriTambah) {
+            if (elKategoriTambah) {
                 choicesTambahInstance = new Choices(elKategoriTambah, {
                     removeItemButton: true,
                     searchPlaceholderValue: 'Cari kategori...',
@@ -445,7 +589,7 @@ if (isset($_POST['update'])) {
         });
 
         // ===================== LOGIKA PREVIEW GAMBAR (TAMBAH PRODUK) =====================
-        let selectedFilesTambah = []; 
+        let selectedFilesTambah = [];
         const fotoInputTambah = document.getElementById('fotoInputTambah');
         const previewContainerTambah = document.getElementById('previewContainerTambah');
 
@@ -455,23 +599,23 @@ if (isset($_POST['update'])) {
         });
 
         function renderPreviewTambah() {
-            previewContainerTambah.innerHTML = ''; 
+            previewContainerTambah.innerHTML = '';
             selectedFilesTambah.forEach((file, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'preview-wrapper';
                 const imgUrl = URL.createObjectURL(file);
                 const img = document.createElement('img');
                 img.src = imgUrl;
-                img.onload = () => URL.revokeObjectURL(imgUrl); 
+                img.onload = () => URL.revokeObjectURL(imgUrl);
                 const removeBtn = document.createElement('span');
-                removeBtn.innerHTML = '&times;'; 
+                removeBtn.innerHTML = '&times;';
                 removeBtn.className = 'preview-remove-btn';
                 removeBtn.addEventListener('click', function(e) {
-                    e.preventDefault(); 
+                    e.preventDefault();
                     selectedFilesTambah.splice(index, 1);
                     const dataTransfer = new DataTransfer();
                     selectedFilesTambah.forEach(f => dataTransfer.items.add(f));
-                    fotoInputTambah.files = dataTransfer.files; 
+                    fotoInputTambah.files = dataTransfer.files;
                     renderPreviewTambah();
                 });
                 wrapper.appendChild(img);
@@ -484,9 +628,9 @@ if (isset($_POST['update'])) {
         modalTambah.addEventListener('hidden.bs.modal', function() {
             var form = modalTambah.querySelector('form');
             form.reset();
-            
+
             // Bersihkan Combo Box saat modal ditutup
-            if(choicesTambahInstance) {
+            if (choicesTambahInstance) {
                 choicesTambahInstance.removeActiveItems();
             }
 
@@ -503,7 +647,7 @@ if (isset($_POST['update'])) {
             const btnEdit = e.target.closest('.btn-edit-produk');
             if (btnEdit) {
                 const idProduk = btnEdit.getAttribute('data-id');
-                
+
                 kontenEdit.innerHTML = `<div class="text-center py-5"><div class="spinner-border" style="color: var(--old-heliotrope);" role="status"></div><p class="mt-2 fw-semibold text-muted">Memuat data produk...</p></div>`;
                 modalEdit.show();
 
@@ -512,10 +656,10 @@ if (isset($_POST['update'])) {
                     .then(htmlResponse => {
                         kontenEdit.innerHTML = htmlResponse;
                         attachEditImagePreviewEvent();
-                        
+
                         // Inisialisasi Combo Box untuk form Edit (setelah AJAX ter-load, KOSONGKAN itemSelectText)
                         const elKategoriEdit = document.getElementById('kategoriSelectEdit');
-                        if(elKategoriEdit) {
+                        if (elKategoriEdit) {
                             new Choices(elKategoriEdit, {
                                 removeItemButton: true,
                                 searchPlaceholderValue: 'Cari kategori...',
@@ -533,27 +677,27 @@ if (isset($_POST['update'])) {
 
         // Fungsi Hapus Foto Lama via AJAX
         function hapusFotoLama(idFoto, element) {
-            if(confirm('Anda yakin ingin menghapus foto ini secara permanen dari sistem?')) {
+            if (confirm('Anda yakin ingin menghapus foto ini secara permanen dari sistem?')) {
                 fetch('produk.php?hapus_foto_ajax=' + idFoto)
-                .then(response => response.text())
-                .then(res => {
-                    if(res === 'Sukses') {
-                        element.closest('.preview-wrapper').remove();
-                    } else {
-                        alert('Gagal menghapus foto.');
-                    }
-                });
+                    .then(response => response.text())
+                    .then(res => {
+                        if (res === 'Sukses') {
+                            element.closest('.preview-wrapper').remove();
+                        } else {
+                            alert('Gagal menghapus foto.');
+                        }
+                    });
             }
         }
 
         // ===================== LOGIKA PREVIEW GAMBAR (EDIT PRODUK) =====================
         let selectedFilesEdit = [];
-        
+
         function attachEditImagePreviewEvent() {
-            selectedFilesEdit = []; 
+            selectedFilesEdit = [];
             const fotoInputEdit = document.getElementById('fotoInputEdit');
             const previewContainerEdit = document.getElementById('previewContainerEdit');
-            
+
             if (fotoInputEdit) {
                 fotoInputEdit.addEventListener('change', function(e) {
                     selectedFilesEdit = Array.from(e.target.files);
@@ -562,24 +706,24 @@ if (isset($_POST['update'])) {
             }
 
             function renderPreviewEdit() {
-                previewContainerEdit.innerHTML = ''; 
+                previewContainerEdit.innerHTML = '';
                 selectedFilesEdit.forEach((file, index) => {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'preview-wrapper';
                     const imgUrl = URL.createObjectURL(file);
                     const img = document.createElement('img');
                     img.src = imgUrl;
-                    img.onload = () => URL.revokeObjectURL(imgUrl); 
+                    img.onload = () => URL.revokeObjectURL(imgUrl);
                     const removeBtn = document.createElement('span');
-                    removeBtn.innerHTML = '&times;'; 
+                    removeBtn.innerHTML = '&times;';
                     removeBtn.className = 'preview-remove-btn';
-                    
+
                     removeBtn.addEventListener('click', function(e) {
-                        e.preventDefault(); 
+                        e.preventDefault();
                         selectedFilesEdit.splice(index, 1);
                         const dataTransfer = new DataTransfer();
                         selectedFilesEdit.forEach(f => dataTransfer.items.add(f));
-                        fotoInputEdit.files = dataTransfer.files; 
+                        fotoInputEdit.files = dataTransfer.files;
                         renderPreviewEdit();
                     });
                     wrapper.appendChild(img);

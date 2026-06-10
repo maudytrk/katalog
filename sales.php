@@ -59,6 +59,7 @@ $totalOrder = $koneksi->query("SELECT COUNT(*) as total FROM orders")->fetch_ass
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Manajemen Sales - Admin</title>
+    <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -402,7 +403,7 @@ $totalOrder = $koneksi->query("SELECT COUNT(*) as total FROM orders")->fetch_ass
                                                         </div>
                                                         <div class="modal-body text-dark bg-white text-start p-4">
                                                             <input type="hidden" name="id_user" value="<?php echo htmlspecialchars($row['id_user']); ?>">
-                                                            
+
                                                             <div class="mb-3">
                                                                 <label class="form-label fw-semibold" style="color: var(--space-cadet);">Nama Lengkap <span class="text-danger">*</span></label>
                                                                 <input type="text" name="nama_lengkap" class="form-control" value="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" required>

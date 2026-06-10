@@ -22,7 +22,7 @@ if (!$data) {
 if (isset($_POST['update_sales'])) {
     $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-    
+
     // Logika jika password juga diganti
     if (!empty($_POST['password'])) {
         $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -41,13 +41,16 @@ if (isset($_POST['update_sales'])) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Sales - Rahayu Admin</title>
+    <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
 </head>
+
 <body class="bg-light">
     <div class="container mt-5">
         <div class="card shadow-sm mx-auto" style="max-width: 500px;">
@@ -77,4 +80,5 @@ if (isset($_POST['update_sales'])) {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

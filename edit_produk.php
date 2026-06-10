@@ -64,7 +64,7 @@ if (isset($_POST['update'])) {
     // 2. UPDATE MULTI-KATEGORI
     // Ambil array kategori yang diceklis
     $kategori_baru_arr = isset($_POST['kategori']) ? $_POST['kategori'] : [];
-    
+
     if (!empty($kategori_baru_arr)) {
         // Hapus SEMUA relasi kategori lama milik produk ini
         $koneksi->query("DELETE FROM produk_kategori WHERE id_produk = '$id'");
@@ -87,18 +87,18 @@ if (isset($_POST['update'])) {
     if (isset($_FILES['foto_baru']['name']) && is_array($_FILES['foto_baru']['name'])) {
         $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp');
         $total_files = count($_FILES['foto_baru']['name']);
-        
+
         for ($i = 0; $i < $total_files; $i++) {
             if ($_FILES['foto_baru']['error'][$i] === UPLOAD_ERR_OK) {
                 $nama_file = $_FILES['foto_baru']['name'][$i];
                 $tmp_name = $_FILES['foto_baru']['tmp_name'][$i];
-                
+
                 $x = explode('.', $nama_file);
                 $ekstensi = strtolower(end($x));
 
                 if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
                     $nama_foto_baru = date('YmdHis') . '-' . rand(1000, 9999) . '.' . $ekstensi;
-                    
+
                     if (move_uploaded_file($tmp_name, 'assets/img/' . $nama_foto_baru)) {
                         $koneksi->query("INSERT INTO produk_foto (id_produk, nama_file) VALUES ('$id', '$nama_foto_baru')");
 
@@ -124,6 +124,7 @@ if (isset($_POST['update'])) {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Produk - Rahayu Admin</title>
+    <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <style>
@@ -161,7 +162,7 @@ if (isset($_POST['update'])) {
             object-fit: cover;
             border-radius: 8px;
             border: 2px solid #E0E1F6;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .preview-remove-btn {
@@ -178,12 +179,12 @@ if (isset($_POST['update'])) {
             text-align: center;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             border: 2px solid white;
             transition: all 0.2s;
             z-index: 10;
         }
-        
+
         .preview-remove-btn:hover {
             background: #CC0000;
             transform: scale(1.1);
@@ -236,7 +237,7 @@ if (isset($_POST['update'])) {
                                     <input type="number" name="stok" class="form-control bg-light" value="<?php echo htmlspecialchars($data['stok']); ?>" required>
                                 </div>
                             </div>
-                            
+
                             <hr class="my-4 text-muted">
 
                             <div class="mb-3">
@@ -251,7 +252,7 @@ if (isset($_POST['update'])) {
                                                 <img src="assets/img/<?= htmlspecialchars($f['nama_file']) ?>">
                                                 <a href="edit_produk.php?id=<?= $id ?>&hapus_foto=<?= $f['id_foto'] ?>" class="preview-remove-btn text-decoration-none" onclick="return confirm('Hapus foto ini dari sistem?')">×</a>
                                             </div>
-                                        <?php endwhile;
+                                    <?php endwhile;
                                     } else {
                                         echo "<span class='text-muted small italic'>Belum ada foto. Silakan tambahkan di bawah.</span>";
                                     }
@@ -261,7 +262,7 @@ if (isset($_POST['update'])) {
                                 <label class="form-label fw-semibold" style="color: #231F48;">Tambah Foto Baru <span class="text-muted small">(Opsional)</span></label>
                                 <input type="file" name="foto_baru[]" class="form-control bg-light" id="fotoInput" accept="image/*" multiple>
                                 <div class="form-text text-muted mb-2">Tekan CTRL (Laptop) atau Tahan layar (HP) untuk memilih banyak gambar.</div>
-                                
+
                                 <div id="previewContainerMandiri" class="d-flex flex-wrap gap-2 mt-2"></div>
                             </div>
 
@@ -282,12 +283,12 @@ if (isset($_POST['update'])) {
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script>
         // SCRIPT LIVE PREVIEW GAMBAR (Sama persis dengan di tambah produk)
-        let selectedFiles = []; 
+        let selectedFiles = [];
         const fotoInput = document.getElementById('fotoInput');
         const previewContainerMandiri = document.getElementById('previewContainerMandiri');
 
@@ -297,34 +298,34 @@ if (isset($_POST['update'])) {
         });
 
         function renderPreviewMandiri() {
-            previewContainerMandiri.innerHTML = ''; 
-            
+            previewContainerMandiri.innerHTML = '';
+
             selectedFiles.forEach((file, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'preview-wrapper';
-                
+
                 const imgUrl = URL.createObjectURL(file);
                 const img = document.createElement('img');
                 img.src = imgUrl;
-                img.onload = () => URL.revokeObjectURL(imgUrl); 
-                
+                img.onload = () => URL.revokeObjectURL(imgUrl);
+
                 const removeBtn = document.createElement('span');
-                removeBtn.innerHTML = '&times;'; 
+                removeBtn.innerHTML = '&times;';
                 removeBtn.className = 'preview-remove-btn';
                 removeBtn.title = 'Batalkan gambar ini';
-                
+
                 removeBtn.addEventListener('click', function(e) {
-                    e.preventDefault(); 
-                    
+                    e.preventDefault();
+
                     selectedFiles.splice(index, 1);
-                    
+
                     const dataTransfer = new DataTransfer();
                     selectedFiles.forEach(f => dataTransfer.items.add(f));
-                    fotoInput.files = dataTransfer.files; 
-                    
+                    fotoInput.files = dataTransfer.files;
+
                     renderPreviewMandiri();
                 });
-                
+
                 wrapper.appendChild(img);
                 wrapper.appendChild(removeBtn);
                 previewContainerMandiri.appendChild(wrapper);

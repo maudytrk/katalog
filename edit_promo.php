@@ -50,13 +50,16 @@ if (isset($_POST['update_promo'])) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Promo - Admin</title>
+    <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
 </head>
+
 <body class="bg-light">
     <div class="container mt-5">
         <div class="card shadow-sm mx-auto" style="max-width: 600px;">
@@ -72,13 +75,13 @@ if (isset($_POST['update_promo'])) {
                     <div class="mb-3">
                         <label class="form-label">Produk</label>
                         <select name="id_produk" class="form-select" required>
-                            <?php 
+                            <?php
                             $produk = $koneksi->query("SELECT * FROM produk");
-                            while($p = $produk->fetch_assoc()):
+                            while ($p = $produk->fetch_assoc()):
                             ?>
-                            <option value="<?= $p['id_produk']; ?>" <?= ($p['id_produk'] == $data['id_produk']) ? 'selected' : ''; ?>>
-                                <?= htmlspecialchars($p['nama_produk']); ?>
-                            </option>
+                                <option value="<?= $p['id_produk']; ?>" <?= ($p['id_produk'] == $data['id_produk']) ? 'selected' : ''; ?>>
+                                    <?= htmlspecialchars($p['nama_produk']); ?>
+                                </option>
                             <?php endwhile; ?>
                         </select>
                     </div>
@@ -104,4 +107,5 @@ if (isset($_POST['update_promo'])) {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
