@@ -8,6 +8,30 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
+// --- TAMBAHAN: Logika Update Data Sales (Via Modal) ---
+if (isset($_POST['update_sales'])) {
+    $id_user = mysqli_real_escape_string($koneksi, $_POST['id_user']);
+    $nama_lengkap = mysqli_real_escape_string($koneksi, trim($_POST['nama_lengkap']));
+    $username = mysqli_real_escape_string($koneksi, trim($_POST['username']));
+    $password_baru = $_POST['password'];
+
+    // Cek apakah username sudah dipakai akun lain
+    $cek = $koneksi->query("SELECT id_user FROM users WHERE username = '$username' AND id_user != '$id_user'");
+    if ($cek->num_rows > 0) {
+        echo "<script>alert('Username sudah digunakan akun lain!'); window.location='sales.php';</script>";
+    } else {
+        if (!empty($password_baru)) {
+            // Update beserta password baru
+            $password_hashed = password_hash($password_baru, PASSWORD_BCRYPT);
+            $koneksi->query("UPDATE users SET nama_lengkap = '$nama_lengkap', username = '$username', password = '$password_hashed' WHERE id_user = '$id_user'");
+        } else {
+            // Update tanpa mengganti password lama
+            $koneksi->query("UPDATE users SET nama_lengkap = '$nama_lengkap', username = '$username' WHERE id_user = '$id_user'");
+        }
+        echo "<script>alert('Data akun sales berhasil diperbarui!'); window.location='sales.php';</script>";
+    }
+}
+
 // Logika Hapus Akun Sales (Aman dari SQL Injection)
 if (isset($_GET['hapus'])) {
     $id = mysqli_real_escape_string($koneksi, $_GET['hapus']);
@@ -353,9 +377,9 @@ $totalOrder = $koneksi->query("SELECT COUNT(*) as total FROM orders")->fetch_ass
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex gap-1 justify-content-center">
-                                                    <a href="edit_sales.php?id=<?php echo $row['id_user']; ?>" class="btn btn-warning btn-sm text-dark" title="Edit Akun">
+                                                    <button type="button" class="btn btn-warning btn-sm text-dark" data-bs-toggle="modal" data-bs-target="#modalEditSales<?php echo $row['id_user']; ?>" title="Edit Akun">
                                                         <i class="fas fa-user-edit"></i>
-                                                    </a>
+                                                    </button>
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm"
                                                         data-bs-toggle="modal"
@@ -367,6 +391,42 @@ $totalOrder = $koneksi->query("SELECT COUNT(*) as total FROM orders")->fetch_ass
                                                 </div>
                                             </td>
                                         </tr>
+
+                                        <div class="modal fade" id="modalEditSales<?php echo $row['id_user']; ?>" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content border-0 shadow">
+                                                    <form method="POST" action="sales.php">
+                                                        <div class="modal-header modal-header-custom">
+                                                            <h5 class="modal-title fw-bold"><i class="fas fa-user-edit me-2 text-warning"></i>Edit Data Akun Sales</h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body text-dark bg-white text-start p-4">
+                                                            <input type="hidden" name="id_user" value="<?php echo htmlspecialchars($row['id_user']); ?>">
+                                                            
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold" style="color: var(--space-cadet);">Nama Lengkap <span class="text-danger">*</span></label>
+                                                                <input type="text" name="nama_lengkap" class="form-control" value="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" required>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold" style="color: var(--space-cadet);">Username / Email <span class="text-danger">*</span></label>
+                                                                <input type="text" name="username" class="form-control" value="<?php echo htmlspecialchars($row['username']); ?>" required>
+                                                            </div>
+
+                                                            <div class="mb-2">
+                                                                <label class="form-label fw-semibold" style="color: var(--space-cadet);">Password Baru</label>
+                                                                <input type="password" name="password" class="form-control" placeholder="********">
+                                                                <div class="form-text text-muted small mt-1"><i class="fas fa-info-circle me-1"></i>Kosongkan jika tidak ingin mengganti password.</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer bg-light p-3 border-top-0 d-flex justify-content-between">
+                                                            <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" name="update_sales" class="btn btn-custom-primary px-4 shadow-sm fw-bold">Simpan Perubahan</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     <?php endwhile; ?>
                                 </tbody>
                             </table>
