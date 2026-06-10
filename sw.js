@@ -1,12 +1,12 @@
 const CACHE_NAME = "rahayu-katalog-v2";
 
 const urlsToCache = [
-  "/",
-  "/index.php",
-  "/katalog.php",
-  "/detail.php",
-  "/css/styles.css",
-  "/js/scripts.js",
+  "./",
+  "./index.php",
+  "./katalog.php",
+  "./detail.php",
+  "./css/styles.css",
+  "./js/scripts.js",
   "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
 ];
@@ -37,6 +37,7 @@ self.addEventListener("activate", (event) => {
 
 // Strategi Fetch: Network First
 self.addEventListener("fetch", (event) => {
+  // Biarkan browser menangani request POST (seperti simpan pesanan) secara otomatis
   if (event.request.method !== "GET") return;
 
   event.respondWith(

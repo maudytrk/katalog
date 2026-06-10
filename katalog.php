@@ -367,16 +367,29 @@ $result = $koneksi->query($sql);
             document.querySelectorAll('.btn-lihat-detail').forEach(button => {
                 button.addEventListener('click', function() {
                     const idProduk = this.getAttribute('data-id');
+
+                    // Tampilkan animasi pemuatan
                     kontainerIsi.innerHTML = `<div class="text-center py-5"><div class="spinner-border" style="color: var(--accent-plum);"></div><p class="text-muted small mt-2 fw-semibold">Sedang memuat data produk...</p></div>`;
                     modalDetail.show();
 
-                    fetch('detail.php?id=' + idProduk)
-                        .then(response => response.text())
+                    // Gunakan jalur absolut agar peramban tidak salah arah
+                    fetch('/katalog/detail.php?id=' + idProduk)
+                        .then(response => {
+                            // Periksa apakah respons dari server atau cache berhasil
+                            if (!response.ok) throw new Error("Data tidak tersedia");
+                            return response.text();
+                        })
                         .then(htmlResponse => {
                             kontainerIsi.innerHTML = htmlResponse;
                         })
                         .catch(error => {
-                            kontainerIsi.innerHTML = `<div class="text-center py-4 text-danger"><i class="fas fa-wifi display-4 mb-2"></i><p class="mt-2 fw-bold">Aplikasi mode offline. Gagal memuat data baru.</p></div>`;
+                            // Peringatan ini HANYA muncul jika produk belum pernah dibuka saat internet menyala
+                            kontainerIsi.innerHTML = `
+                <div class="text-center py-4 text-danger">
+                    <i class="fas fa-wifi display-4 mb-2"></i>
+                    <p class="mt-2 fw-bold">Anda sedang offline.</p>
+                    <p class="text-muted small">Spesifikasi produk ini belum tersimpan di memori. Silakan buka produk ini minimal satu kali saat internet terhubung.</p>
+                </div>`;
                         });
                 });
             });

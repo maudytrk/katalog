@@ -49,14 +49,18 @@ const dbPromise = idb.openDB("RahayuOrderDB", 1, {
   },
 });
 
-// 3. Intersepsi Formulir Pesanan Cepat
-document.addEventListener("DOMContentLoaded", () => {
-  const orderForm = document.querySelector("#modalOrderCepat form");
+// 3. Intersepsi Formulir Pesanan Cepat (Sistem Kunci Tombol)
+document.addEventListener("click", async (e) => {
+  // Cari apakah yang diklik adalah tombol simpan transaksi
+  const tombolSimpan = e.target.closest("#btn-submit-order");
 
-  if (orderForm) {
-    orderForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  if (tombolSimpan) {
+    e.preventDefault(); // Langkah krusial: Tahan peramban agar tidak pindah halaman
 
+    // Cari tag <form> yang membungkus tombol ini
+    const orderForm = tombolSimpan.closest("form");
+
+    if (orderForm) {
       const formData = new FormData(orderForm);
       const dataOrder = Object.fromEntries(formData.entries());
       dataOrder.tanggal = new Date().toISOString();
@@ -66,7 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         simpanPesananOffline(dataOrder);
       }
-    });
+    } else {
+      alert(
+        "Sistem gagal menemukan kerangka formulir. Cek struktur HTML Anda.",
+      );
+    }
   }
 });
 
@@ -88,7 +96,7 @@ async function simpanPesananOffline(data) {
 // 5. Kirim Data ke Server PHP
 async function kirimPesananKeServer(data) {
   try {
-    const response = await fetch("proses_order_cepat.php", {
+    const response = await fetch("/katalog/proses_order_cepat.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -96,7 +104,6 @@ async function kirimPesananKeServer(data) {
 
     const result = await response.json();
 
-    // Tampilkan pesan sukses atau error langsung dari respons PHP
     if (result.status === "success") {
       alert(result.message);
       window.location.reload();
@@ -121,7 +128,7 @@ async function sinkronisasiPesananOffline() {
 
     for (const order of allOrders) {
       try {
-        const response = await fetch("proses_order_cepat.php", {
+        const response = await fetch("/katalog/proses_order_cepat.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(order),
@@ -129,7 +136,6 @@ async function sinkronisasiPesananOffline() {
 
         const result = await response.json();
 
-        // Hapus data lokal hanya jika server mengembalikan status sukses
         if (result.status === "success") {
           await db.delete("offlineOrders", order.id);
           berhasilSync++;
