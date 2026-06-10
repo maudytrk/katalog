@@ -11,6 +11,15 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'admin') {
 if (isset($_POST['simpan'])) {
     // 1. Ambil data teks produk
     $kode      = mysqli_real_escape_string($koneksi, $_POST['kode']);
+
+    // --- CEK KODE PRODUK GANDA ---
+    $cek_kode = $koneksi->query("SELECT id_produk FROM produk WHERE kode_produk = '$kode'");
+    if ($cek_kode->num_rows > 0) {
+        echo "<script>alert('Gagal! Kode Produk \"$kode\" sudah digunakan. Silakan gunakan kode yang berbeda.'); window.history.back();</script>";
+        exit;
+    }
+    // -----------------------------
+
     $nama      = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
     $harga     = (int)$_POST['harga'];
@@ -26,12 +35,12 @@ if (isset($_POST['simpan'])) {
         exit;
     }
 
-    // 2. Insert data produk utama (Catatan: kolom id_kategori sudah dihapus dari perintah INSERT)
+    // 2. Insert data produk utama
     $query = "INSERT INTO produk (kode_produk, nama_produk, deskripsi, harga, stok, link_tiktok, link_shopee, link_lazada) 
               VALUES ('$kode', '$nama', '$deskripsi', '$harga', '$stok', '$tiktok', '$shopee', '$lazada')";
 
     if ($koneksi->query($query)) {
-        $id_produk_baru = $koneksi->insert_id; 
+        $id_produk_baru = $koneksi->insert_id;
 
         // 3. Simpan relasi multi-kategori ke tabel perantara (produk_kategori)
         foreach ($kategori_arr as $id_kat) {
@@ -39,25 +48,25 @@ if (isset($_POST['simpan'])) {
             $koneksi->query("INSERT INTO produk_kategori (id_produk, id_kategori) VALUES ('$id_produk_baru', '$id_kat_clean')");
         }
 
-        // 4. Logika Multi-Upload Foto (Dipertahankan dari hasil sebelumnya)
+        // 4. Logika Multi-Upload Foto
         $foto_utama_set = false;
         $jumlah_berhasil = 0;
 
         if (isset($_FILES['foto']['name']) && is_array($_FILES['foto']['name'])) {
             $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp');
             $total_files = count($_FILES['foto']['name']);
-            
+
             for ($i = 0; $i < $total_files; $i++) {
                 if ($_FILES['foto']['error'][$i] === UPLOAD_ERR_OK) {
                     $nama_file = $_FILES['foto']['name'][$i];
                     $tmp_name = $_FILES['foto']['tmp_name'][$i];
-                    
+
                     $x = explode('.', $nama_file);
                     $ekstensi = strtolower(end($x));
 
                     if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
                         $nama_foto_baru = date('YmdHis') . '-' . rand(1000, 9999) . '.' . $ekstensi;
-                        
+
                         if (move_uploaded_file($tmp_name, 'assets/img/' . $nama_foto_baru)) {
                             $koneksi->query("INSERT INTO produk_foto (id_produk, nama_file) VALUES ('$id_produk_baru', '$nama_foto_baru')");
 
@@ -71,10 +80,9 @@ if (isset($_POST['simpan'])) {
                 }
             }
         }
-        
+
         echo "<script>alert('Sukses! Produk baru beserta $jumlah_berhasil foto dan kategori berhasil ditambahkan.'); window.location='produk.php';</script>";
     } else {
         echo "<script>alert('Gagal menyimpan data ke database: " . $koneksi->error . "'); window.history.back();</script>";
     }
 }
-?>
