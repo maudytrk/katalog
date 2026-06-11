@@ -502,6 +502,141 @@ $today = date('Y-m-d');
             });
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const orderForm = document.querySelector('form[action="proses_order_cepat.php"]');
+
+            if (orderForm) {
+                orderForm.addEventListener("submit", async function(e) {
+                    e.preventDefault();
+
+                    const btnSubmit = orderForm.querySelector('button[type="submit"]');
+                    const teksAsli = btnSubmit ? btnSubmit.innerHTML : "Simpan Transaksi";
+
+                    if (btnSubmit) {
+                        btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+                        btnSubmit.disabled = true;
+                    }
+
+                    const formData = new FormData(orderForm);
+                    const dataOrder = Object.fromEntries(formData.entries());
+                    dataOrder.tanggal = new Date().toISOString();
+                    dataOrder.id_lokal = Date.now(); // Kunci identitas unik untuk memori lokal
+
+                    if (navigator.onLine) {
+                        try {
+                            const response = await fetch("/katalog/proses_order_cepat.php", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(dataOrder)
+                            });
+
+                            const textResponse = await response.text();
+
+                            try {
+                                const result = JSON.parse(textResponse);
+                                if (result.status === "success") {
+                                    alert(result.message);
+                                    window.location.reload();
+                                } else {
+                                    alert("Gagal: " + result.message);
+                                    resetTombol(btnSubmit, teksAsli);
+                                }
+                            } catch (parseError) {
+                                alert("Terjadi kesalahan pada sistem server PHP.");
+                                resetTombol(btnSubmit, teksAsli);
+                            }
+                        } catch (error) {
+                            simpanPesananLokal(dataOrder, btnSubmit, teksAsli);
+                        }
+                    } else {
+                        simpanPesananLokal(dataOrder, btnSubmit, teksAsli);
+                    }
+                });
+            }
+
+            function resetTombol(btnSubmit, teksAsli) {
+                if (btnSubmit) {
+                    btnSubmit.innerHTML = teksAsli;
+                    btnSubmit.disabled = false;
+                }
+            }
+
+            // FUNGSI BARU: Menyimpan pesanan tanpa IndexedDB (Sangat Ringan & Aman)
+            function simpanPesananLokal(data, btnSubmit, teksAsli) {
+                try {
+                    // Ambil data lama atau buat ruang kosong baru
+                    let pesananOffline = JSON.parse(localStorage.getItem("offlineOrders")) || [];
+
+                    // Masukkan pesanan baru
+                    pesananOffline.push(data);
+
+                    // Simpan kembali ke dalam brankas peramban
+                    localStorage.setItem("offlineOrders", JSON.stringify(pesananOffline));
+
+                    alert("MODE OFFLINE AKTIF. Transaksi tersimpan aman di memori perangkat. Sistem akan mengirim data saat internet menyala.");
+                    window.location.reload();
+                } catch (err) {
+                    alert("Penyimpanan luring gagal. Memori peramban mungkin penuh.");
+                    resetTombol(btnSubmit, teksAsli);
+                }
+            }
+
+            // FUNGSI BARU: Sinkronisasi super cepat
+            async function prosesSinkronisasi() {
+                let pesananOffline = JSON.parse(localStorage.getItem("offlineOrders")) || [];
+                if (pesananOffline.length === 0) return;
+
+                let berhasilSync = 0;
+                let sisaPesanan = []; // Untuk menampung pesanan yang gagal terkirim (misal karena sinyal putus nyambung)
+
+                for (const order of pesananOffline) {
+                    try {
+                        const response = await fetch("/katalog/proses_order_cepat.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(order)
+                        });
+                        const textResponse = await response.text();
+
+                        try {
+                            const result = JSON.parse(textResponse);
+                            if (result.status === "success") {
+                                berhasilSync++;
+                            } else {
+                                // Jika server PHP menolak (misal stok habis), data tetap dihapus agar tidak nyangkut
+                                console.error("Ditolak server:", result.message);
+                            }
+                        } catch (e) {
+                            sisaPesanan.push(order); // Pertahankan data jika PHP error
+                        }
+                    } catch (e) {
+                        sisaPesanan.push(order); // Pertahankan data jika internet kembali mati
+                    }
+                }
+
+                // Perbarui isi brankas peramban (Hapus yang sukses, simpan yang masih tertunda)
+                localStorage.setItem("offlineOrders", JSON.stringify(sisaPesanan));
+
+                if (berhasilSync > 0) {
+                    alert(`SINKRONISASI SUKSES: ${berhasilSync} data pesanan luring telah berhasil disalurkan ke sistem pusat.`);
+                    window.location.reload();
+                }
+            }
+
+            // Deteksi otomatis saat internet kembali menyala
+            window.addEventListener("online", prosesSinkronisasi);
+            if (navigator.onLine) {
+                prosesSinkronisasi();
+            }
+        });
+    </script>
+
 </body>
 
 </html>

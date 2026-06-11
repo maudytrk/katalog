@@ -5,9 +5,15 @@ include 'koneksi.php';
 // Atur header agar aplikasi mengenali output sebagai JSON
 header('Content-Type: application/json');
 
-// 1. Proteksi Hak Akses (Hanya boleh diakses oleh sales)
+// 1. Proteksi Hak Akses
 if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'sales') {
-    echo json_encode(['status' => 'error', 'message' => 'Akses ditolak! Halaman ini hanya untuk Tim Sales.']);
+    echo json_encode(['status' => 'error', 'message' => 'Akses ditolak! Sesi Anda mungkin telah kedaluwarsa. Silakan login kembali.']);
+    exit;
+}
+
+// 1.5 Proteksi Tambahan
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Galat: ID User tidak ditemukan dalam sesi saat ini. Silakan logout dan login kembali.']);
     exit;
 }
 
@@ -17,28 +23,31 @@ $data = json_decode($inputJSON, TRUE);
 
 if ($data) {
 
-    // AKTIFKAN REPORT EXCEPTION MYSQLI (Penting agar try-catch berfungsi pada MySQLi)
+    // AKTIFKAN REPORT EXCEPTION MYSQLI
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    // 2. Ambil data input dari objek JSON (Menggunakan 'user_id' disesuaikan dengan file riwayat_sales.php)
+    // 2. Ambil data input 
     $id_user        = mysqli_real_escape_string($koneksi, $_SESSION['user_id']);
-    $id_produk      = (int)$data['id_produk'];
-    $harga_satuan   = (float)$data['harga_satuan'];
-    $nama_pelanggan = mysqli_real_escape_string($koneksi, trim($data['nama_pelanggan']));
-    $no_hp          = mysqli_real_escape_string($koneksi, trim($data['no_hp']));
-    $jumlah_beli    = (int)$data['jumlah_beli'];
+    $id_produk      = isset($data['id_produk']) ? (int)$data['id_produk'] : 0;
+    $harga_satuan   = isset($data['harga_satuan']) ? (float)$data['harga_satuan'] : 0;
+    $nama_pelanggan = isset($data['nama_pelanggan']) ? mysqli_real_escape_string($koneksi, trim($data['nama_pelanggan'])) : '';
+    $no_hp          = isset($data['no_hp']) ? mysqli_real_escape_string($koneksi, trim($data['no_hp'])) : '';
+    $jumlah_beli    = isset($data['jumlah_beli']) && $data['jumlah_beli'] !== '' ? (int)$data['jumlah_beli'] : 0;
 
-    // Validasi input dasar untuk mencegah angka minus atau nol
+    // Buat variabel tanggal secara otomatis dari server
+    $tanggal        = date('Y-m-d H:i:s');
+
+    // Validasi input dasar
     if ($jumlah_beli <= 0) {
-        echo json_encode(['status' => 'error', 'message' => 'Gagal! Jumlah beli tidak valid.']);
+        echo json_encode(['status' => 'error', 'message' => 'Gagal! Jumlah beli tidak valid atau kosong.']);
         exit;
     }
 
-    // 3. Mulai Database Transaction (Dipindah ke atas agar pengecekan stok terkunci aman)
+    // 3. Mulai Database Transaction 
     $koneksi->begin_transaction();
 
     try {
-        // 4. Validasi Ulang Stok di Sisi Server (Menggunakan FOR UPDATE untuk mencegah Race Condition)
+        // 4. Validasi Ulang Stok 
         $query_cek_stok = "SELECT stok FROM produk WHERE id_produk = '$id_produk' LIMIT 1 FOR UPDATE";
         $res_stok = $koneksi->query($query_cek_stok);
         $data_produk = $res_stok->fetch_assoc();
@@ -56,15 +65,15 @@ if ($data) {
         // 5. Hitung Total Bayar
         $total_bayar = $jumlah_beli * $harga_satuan;
 
-        // A. Generate ID Alfanumerik Acak & Panjang (Contoh: ORD-A8F93B4CDE12)
+        // A. Generate ID Alfanumerik 
         $id_order_baru = 'ORD-' . strtoupper(bin2hex(random_bytes(6)));
 
-        // B. Insert ke tabel 'orders' (masukkan id_order_baru secara manual)
-        $query_order = "INSERT INTO orders (id_order, id_user, nama_pelanggan, no_hp, total_bayar, status_order) 
-                        VALUES ('$id_order_baru', '$id_user', '$nama_pelanggan', '$no_hp', '$total_bayar', 'pending')";
+        // B. Insert ke tabel 'orders'
+        $query_order = "INSERT INTO orders (id_order, id_user, nama_pelanggan, no_hp, total_bayar, status_order, tgl_pesan) 
+                VALUES ('$id_order_baru', '$id_user', '$nama_pelanggan', '$no_hp', '$total_bayar', 'pending', '$tanggal')";
         $koneksi->query($query_order);
 
-        // C. Insert ke tabel 'order_detail' menggunakan ID yang di-generate tadi
+        // C. Insert ke tabel 'order_detail' 
         $query_detail = "INSERT INTO order_detail (id_order, id_produk, jumlah, harga_satuan, subtotal) 
                          VALUES ('$id_order_baru', '$id_produk', '$jumlah_beli', '$harga_satuan', '$total_bayar')";
         $koneksi->query($query_detail);
@@ -77,28 +86,26 @@ if ($data) {
         // Jika semua sukses, commit data
         $koneksi->commit();
 
-        // Kembalikan respons berhasil dalam format JSON
+        // Kembalikan respons JSON
         echo json_encode([
             'status' => 'success',
             'message' => "Transaksi Berhasil! ID Order Pelanggan: $id_order_baru",
             'id_order' => $id_order_baru
         ]);
         exit;
-    } catch (Exception $e) {
-        // Jika ada query yang gagal atau stok tidak cukup, batalkan semua manipulasi data
+    } catch (\Exception $e) { // Tambahkan garis miring terbalik di sini
         $koneksi->rollback();
         $pesan_error = $e->getMessage();
 
-        // Memisahkan pesan error karena stok/produk dengan pesan error query database
         if ($pesan_error == "Produk tidak ditemukan." || $pesan_error == "Jumlah beli melebihi ketersediaan stok terbaru.") {
             echo json_encode(['status' => 'error', 'message' => "Gagal Simpan! $pesan_error"]);
         } else {
-            echo json_encode(['status' => 'error', 'message' => "Terjadi kesalahan sistem, transaksi gagal diproses."]);
+            // PERUBAHAN: Tampilkan error asli MySQL untuk melacak masalah
+            echo json_encode(['status' => 'error', 'message' => "MySQL Error: " . $pesan_error]);
         }
         exit;
     }
 } else {
-    // Menangani akses langsung ke URL tanpa data JSON
     echo json_encode(['status' => 'error', 'message' => 'Permintaan tidak valid.']);
     exit;
 }
