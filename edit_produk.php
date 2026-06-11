@@ -54,66 +54,65 @@ if (isset($_POST['update'])) {
     $shopee    = mysqli_real_escape_string($koneksi, $_POST['link_shopee']);
     $lazada    = mysqli_real_escape_string($koneksi, $_POST['link_lazada']);
 
-    // 1. Update data teks produk (TIDAK ADA id_kategori di sini karena sudah dipisah ke tabel relasi)
+    // 1. Update data teks produk
     $query_update = "UPDATE produk SET nama_produk='$nama', deskripsi='$deskripsi', 
                      harga='$harga', stok='$stok', link_tiktok='$tiktok', link_shopee='$shopee', 
                      link_lazada='$lazada' WHERE id_produk='$id'";
 
-    $koneksi->query($query_update);
+    if ($koneksi->query($query_update)) {
+        // 2. UPDATE MULTI-KATEGORI
+        $kategori_baru_arr = isset($_POST['kategori']) ? $_POST['kategori'] : [];
 
-    // 2. UPDATE MULTI-KATEGORI
-    // Ambil array kategori yang diceklis
-    $kategori_baru_arr = isset($_POST['kategori']) ? $_POST['kategori'] : [];
-
-    if (!empty($kategori_baru_arr)) {
-        // Hapus SEMUA relasi kategori lama milik produk ini
-        $koneksi->query("DELETE FROM produk_kategori WHERE id_produk = '$id'");
-
-        // Masukkan relasi kategori yang baru
-        foreach ($kategori_baru_arr as $id_kat_baru) {
-            $id_kat_clean = mysqli_real_escape_string($koneksi, $id_kat_baru);
-            $koneksi->query("INSERT INTO produk_kategori (id_produk, id_kategori) VALUES ('$id', '$id_kat_clean')");
+        if (!empty($kategori_baru_arr)) {
+            $koneksi->query("DELETE FROM produk_kategori WHERE id_produk = '$id'");
+            foreach ($kategori_baru_arr as $id_kat_baru) {
+                $id_kat_clean = mysqli_real_escape_string($koneksi, $id_kat_baru);
+                $koneksi->query("INSERT INTO produk_kategori (id_produk, id_kategori) VALUES ('$id', '$id_kat_clean')");
+            }
         }
-    }
 
-    // 3. Proses Tambah Foto Baru (Multi-Upload dengan Filter Keamanan)
-    $foto_utama_set = false;
-    // Cek apakah produk ini sudah punya foto utama atau belum
-    $cek_foto_utama = $koneksi->query("SELECT foto FROM produk WHERE id_produk = '$id'")->fetch_assoc();
-    if (!empty($cek_foto_utama['foto']) && $cek_foto_utama['foto'] !== 'no-image.jpg') {
-        $foto_utama_set = true;
-    }
+        // 3. Proses Tambah Foto Baru
+        $foto_utama_set = false;
+        $cek_foto_utama = $koneksi->query("SELECT foto FROM produk WHERE id_produk = '$id'")->fetch_assoc();
+        if (!empty($cek_foto_utama['foto']) && $cek_foto_utama['foto'] !== 'no-image.jpg') {
+            $foto_utama_set = true;
+        }
 
-    if (isset($_FILES['foto_baru']['name']) && is_array($_FILES['foto_baru']['name'])) {
-        $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp');
-        $total_files = count($_FILES['foto_baru']['name']);
+        if (isset($_FILES['foto_baru']['name']) && is_array($_FILES['foto_baru']['name'])) {
+            $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp');
+            $total_files = count($_FILES['foto_baru']['name']);
 
-        for ($i = 0; $i < $total_files; $i++) {
-            if ($_FILES['foto_baru']['error'][$i] === UPLOAD_ERR_OK) {
-                $nama_file = $_FILES['foto_baru']['name'][$i];
-                $tmp_name = $_FILES['foto_baru']['tmp_name'][$i];
+            for ($i = 0; $i < $total_files; $i++) {
+                if ($_FILES['foto_baru']['error'][$i] === UPLOAD_ERR_OK) {
+                    $nama_file = $_FILES['foto_baru']['name'][$i];
+                    $tmp_name = $_FILES['foto_baru']['tmp_name'][$i];
 
-                $x = explode('.', $nama_file);
-                $ekstensi = strtolower(end($x));
+                    $x = explode('.', $nama_file);
+                    $ekstensi = strtolower(end($x));
 
-                if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
-                    $nama_foto_baru = date('YmdHis') . '-' . rand(1000, 9999) . '.' . $ekstensi;
+                    if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
+                        $nama_foto_baru = date('YmdHis') . '-' . rand(1000, 9999) . '.' . $ekstensi;
 
-                    if (move_uploaded_file($tmp_name, 'assets/img/' . $nama_foto_baru)) {
-                        $koneksi->query("INSERT INTO produk_foto (id_produk, nama_file) VALUES ('$id', '$nama_foto_baru')");
+                        if (move_uploaded_file($tmp_name, 'assets/img/' . $nama_foto_baru)) {
+                            $koneksi->query("INSERT INTO produk_foto (id_produk, nama_file) VALUES ('$id', '$nama_foto_baru')");
 
-                        // Jadikan foto baru pertama sebagai cover JIKA sebelumnya kosong
-                        if (!$foto_utama_set) {
-                            $koneksi->query("UPDATE produk SET foto = '$nama_foto_baru' WHERE id_produk = '$id'");
-                            $foto_utama_set = true;
+                            if (!$foto_utama_set) {
+                                $koneksi->query("UPDATE produk SET foto = '$nama_foto_baru' WHERE id_produk = '$id'");
+                                $foto_utama_set = true;
+                            }
                         }
                     }
                 }
             }
         }
+        
+        $_SESSION['sukses'] = "Data produk berhasil diperbarui!";
+    } else {
+        $_SESSION['gagal'] = "Gagal memperbarui data: " . mysqli_error($koneksi);
     }
-
-    echo "<script>alert('Data berhasil diperbarui!'); window.location='produk.php';</script>";
+    
+    header("Location: produk.php");
+    exit;
 }
 ?>
 

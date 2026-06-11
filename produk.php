@@ -21,10 +21,16 @@ if (isset($_GET['hapus'])) {
     }
 
     $koneksi->query("DELETE FROM produk_foto WHERE id_produk = '$id'");
-    $koneksi->query("DELETE FROM produk_kategori WHERE id_produk = '$id'"); // Menghapus relasi kategori
-    $koneksi->query("DELETE FROM produk WHERE id_produk = '$id'");
-
-    echo "<script>alert('Produk dan semua data terkait berhasil dihapus!'); window.location='produk.php';</script>";
+    $koneksi->query("DELETE FROM produk_kategori WHERE id_produk = '$id'");
+    
+    if ($koneksi->query("DELETE FROM produk WHERE id_produk = '$id'")) {
+        $_SESSION['sukses'] = "Produk berhasil dihapus!";
+    } else {
+        $_SESSION['gagal'] = "Gagal menghapus produk!";
+    }
+    
+    header("Location: produk.php");
+    exit;
 }
 
 // Logika Hapus SATU Foto via AJAX (Saat Proses Edit)
@@ -56,9 +62,15 @@ if (isset($_POST['update'])) {
     $lazada    = mysqli_real_escape_string($koneksi, $_POST['link_lazada']);
 
     // 1. Update data teks
-    $koneksi->query("UPDATE produk SET nama_produk='$nama', deskripsi='$deskripsi', 
+    $update_query = $koneksi->query("UPDATE produk SET nama_produk='$nama', deskripsi='$deskripsi', 
                      harga='$harga', stok='$stok', link_tiktok='$tiktok', link_shopee='$shopee', 
                      link_lazada='$lazada' WHERE id_produk='$id_edit'");
+
+    if (!$update_query) {
+        $_SESSION['gagal'] = "Gagal memperbarui data produk: " . mysqli_error($koneksi);
+        header("Location: produk.php");
+        exit;
+    }
 
     // 2. Update Kategori
     $kategori_baru_arr = isset($_POST['kategori']) ? $_POST['kategori'] : [];
@@ -104,7 +116,10 @@ if (isset($_POST['update'])) {
             }
         }
     }
-    echo "<script>alert('Data produk berhasil diperbarui!'); window.location='produk.php';</script>";
+    
+    $_SESSION['sukses'] = "Data produk berhasil diperbarui!";
+    header("Location: produk.php");
+    exit;
 }
 ?>
 
@@ -561,6 +576,8 @@ if (isset($_POST['update'])) {
 
     <?php include 'modal_konfirmasi_hapus.php'; ?>
     <?php include 'modal_logout.php'; ?>
+    <?php include 'modal_notifikasi.php'; ?>
+    <?php include 'modal_konfirmasi_hapus_foto.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
