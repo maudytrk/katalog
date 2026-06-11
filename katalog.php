@@ -336,8 +336,9 @@ $result = $koneksi->query($sql);
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
                         <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore.id@gmail.com<br>
-                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
+                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750<br>
+                        <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore<br>
+                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com<br>
                     </p>
                 </div>
             </div>
