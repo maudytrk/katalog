@@ -109,6 +109,30 @@ $result_promo = $koneksi->query($sql_promo);
             background-color: var(--accent-gray);
             opacity: 0.3;
         }
+
+        /* Style untuk footer contact links */
+        .contact-link {
+            color: var(--bg-lavender);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-link:hover {
+            transform: translateX(5px);
+        }
+
+        .contact-link-wa:hover {
+            color: #25D366 !important;
+        }
+
+        .contact-link-ig:hover {
+            color: #E4405F !important;
+        }
+
+        .contact-link-email:hover {
+            color: #D44638 !important;
+        }
     </style>
 </head>
 
@@ -284,9 +308,15 @@ $result_promo = $koneksi->query($sql_promo);
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
                         <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750<br>
-                        <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore<br>
-                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com<br>
+                        <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
+                            <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
+                        </a><br>
+                        <a href="https://www.instagram.com/rahayuofficialstore" target="_blank" class="contact-link contact-link-ig">
+                            <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore
+                        </a><br>
+                        <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
+                            <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
+                        </a><br>
                     </p>
                 </div>
             </div>
