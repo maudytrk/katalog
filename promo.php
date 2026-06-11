@@ -16,9 +16,13 @@ if (isset($_GET['hapus'])) {
     $cek_promo = $koneksi->query("SELECT id_promo FROM promo WHERE id_promo = '$id'");
     if ($cek_promo->num_rows > 0) {
         $koneksi->query("DELETE FROM promo WHERE id_promo = '$id'");
-        echo "<script>alert('Promo berhasil dihapus!'); window.location='promo.php';</script>";
+        $_SESSION['sukses'] = "Promo berhasil dihapus!";
+        header("Location: promo.php");
+        exit;
     } else {
-        echo "<script>alert('Data promo tidak ditemukan!'); window.location='promo.php';</script>";
+        $_SESSION['gagal'] = "Data promo tidak ditemukan!";
+        header("Location: promo.php");
+        exit;
     }
 }
 ?>
@@ -387,6 +391,7 @@ if (isset($_GET['hapus'])) {
 
     <?php include 'modal_logout.php'; ?>
     <?php include 'modal_konfirmasi_hapus.php'; ?>
+    <?php include 'modal_notifikasi.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>

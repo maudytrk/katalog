@@ -17,7 +17,8 @@ if (isset($_POST['simpan_promo'])) {
 
     // Validasi Logika Tanggal
     if (strtotime($tgl_selesai) < strtotime($tgl_mulai)) {
-        echo "<script>alert('Gagal! Tanggal selesai tidak boleh lebih awal dari tanggal mulai.'); window.history.back();</script>";
+        $_SESSION['gagal'] = "Tanggal selesai tidak boleh lebih awal dari tanggal mulai!";
+        header("Location: promo.php");
         exit;
     }
 
@@ -25,9 +26,13 @@ if (isset($_POST['simpan_promo'])) {
               VALUES ('$nama_promo', '$id_produk', '$diskon', '$tgl_mulai', '$tgl_selesai')";
 
     if ($koneksi->query($query)) {
-        echo "<script>alert('Promo berhasil ditambahkan!'); window.location='promo.php';</script>";
+        $_SESSION['sukses'] = "Promo berhasil ditambahkan!";
+        header("Location: promo.php");
+        exit;
     } else {
-        echo "Error: " . $koneksi->error;
+        $_SESSION['gagal'] = "Error: " . $koneksi->error;
+        header("Location: promo.php");
+        exit;
     }
 }
 ?>

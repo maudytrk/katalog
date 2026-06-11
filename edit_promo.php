@@ -15,7 +15,8 @@ $data = $ambildata->fetch_assoc();
 
 // Jika ID tidak valid atau data tidak ditemukan di database
 if (!$data) {
-    echo "<script>alert('Data promo tidak ditemukan!'); window.location='promo.php';</script>";
+    $_SESSION['gagal'] = "Data promo tidak ditemukan!";
+    header("Location: promo.php");
     exit;
 }
 
@@ -28,7 +29,8 @@ if (isset($_POST['update_promo'])) {
 
     // Validasi Logika Tanggal
     if (strtotime($tgl_selesai) < strtotime($tgl_mulai)) {
-        echo "<script>alert('Gagal! Tanggal selesai tidak boleh lebih awal dari tanggal mulai.'); window.history.back();</script>";
+        $_SESSION['gagal'] = "Tanggal selesai tidak boleh lebih awal dari tanggal mulai!";
+        header("Location: edit_promo.php?id=$id");
         exit;
     }
 
@@ -41,9 +43,13 @@ if (isset($_POST['update_promo'])) {
               WHERE id_promo = '$id'";
 
     if ($koneksi->query($query)) {
-        echo "<script>alert('Promo berhasil diperbarui!'); window.location='promo.php';</script>";
+        $_SESSION['sukses'] = "Promo berhasil diperbarui!";
+        header("Location: promo.php");
+        exit;
     } else {
-        echo "Error: " . $koneksi->error;
+        $_SESSION['gagal'] = "Error: " . $koneksi->error;
+        header("Location: edit_promo.php?id=$id");
+        exit;
     }
 }
 ?>
@@ -58,13 +64,30 @@ if (isset($_POST['update_promo'])) {
     <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --old-heliotrope: #6B4773;
+            --space-cadet: #231F48;
+        }
+        
+        .btn-custom-primary {
+            background-color: var(--old-heliotrope);
+            color: white;
+            border: none;
+        }
+        
+        .btn-custom-primary:hover {
+            background-color: var(--space-cadet);
+        }
+    </style>
 </head>
 
 <body class="bg-light">
     <div class="container mt-5">
         <div class="card shadow-sm mx-auto" style="max-width: 600px;">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Edit Promo</h5>
+            <div class="card-header" style="background-color: var(--space-cadet); color: white;">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Promo</h5>
             </div>
             <div class="card-body">
                 <form method="POST">
@@ -99,12 +122,15 @@ if (isset($_POST['update_promo'])) {
                             <input type="date" name="tgl_selesai" class="form-control" value="<?= htmlspecialchars($data['tgl_selesai']); ?>" required>
                         </div>
                     </div>
-                    <button type="submit" name="update_promo" class="btn btn-primary w-100 shadow-sm">Simpan Perubahan</button>
+                    <button type="submit" name="update_promo" class="btn btn-custom-primary w-100 shadow-sm">Simpan Perubahan</button>
                     <a href="promo.php" class="btn btn-light w-100 border text-muted mt-2">Batal</a>
                 </form>
             </div>
         </div>
     </div>
+    
+    <?php include 'modal_notifikasi.php'; ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
