@@ -377,6 +377,29 @@ $result = $koneksi->query($sql);
         </div>
     </footer>
 
+    <!-- Modal Peringatan Global -->
+<div class="modal fade" id="warningModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0" style="background-color: var(--accent-plum); border-radius: 1rem 1rem 0 0;">
+                <h5 class="modal-title fw-bold text-white" id="warningModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Peringatan
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <i class="fas fa-info-circle fa-3x mb-3" style="color: var(--accent-plum);"></i>
+                <p class="mb-0 fs-5" id="warningMessage">Pesan peringatan akan ditampilkan di sini.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn px-4 rounded-pill text-white fw-bold shadow-sm" style="background-color: var(--accent-indigo);" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <?php if ($is_login) include 'modal_logout.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -437,11 +460,14 @@ $result = $koneksi->query($sql);
                         const checkedCount = document.querySelectorAll('.compare-checkbox:checked').length;
 
                         if (checkedCount > 4) {
-                            alert('Maksimal memilih 4 produk untuk dibandingkan secara bersamaan agar tampilan tetap rapi.');
+                            // Tampilkan modal peringatan
+                            const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+                            document.getElementById('warningModalLabel').innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Maksimal 4 Produk';
+                            document.getElementById('warningMessage').textContent = 'Anda hanya dapat membandingkan maksimal 4 produk dalam satu waktu untuk menjaga tampilan tabel perbandingan tetap rapi dan informatif.';
+                            warningModal.show();
                             this.checked = false;
                             return;
                         }
-
                         if (checkedCount > 0) {
                             floatingBtn.style.display = 'block';
                             compareCount.textContent = checkedCount;
@@ -454,6 +480,14 @@ $result = $koneksi->query($sql);
                 submitBtn.addEventListener('click', function() {
                     const checkedBoxes = document.querySelectorAll('.compare-checkbox:checked');
                     const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+                    if (ids.length < 2) {
+                        const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+                        document.getElementById('warningModalLabel').innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Produk Kurang';
+                        document.getElementById('warningMessage').textContent = 'Silakan pilih minimal 2 produk untuk dibandingkan.';
+                        warningModal.show();
+                        return;
+                    }
 
                     if (ids.length > 0) {
                         window.location.href = 'bandingkan.php?ids=' + ids.join(',');
