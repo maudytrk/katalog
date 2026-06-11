@@ -1,4 +1,9 @@
 <?php
+// Mulai session di baris PALING PERTAMA
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include 'koneksi.php';
 $today = date('Y-m-d');
 ?>
