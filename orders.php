@@ -16,9 +16,13 @@ if (isset($_POST['update_status'])) {
     // Pastikan nama kolom di database Anda adalah status_order
     $update = $koneksi->query("UPDATE orders SET status_order = '$status_baru' WHERE id_order = '$id_order'");
     if ($update) {
-        echo "<script>alert('Status pesanan berhasil diperbarui!'); window.location='orders.php';</script>";
+        $_SESSION['sukses'] = "Status pesanan #$id_order berhasil diperbarui menjadi " . ucfirst($status_baru) . "!";
+        header("Location: orders.php");
+        exit;
     } else {
-        echo "<script>alert('Gagal memperbarui status: " . $koneksi->error . "');</script>";
+        $_SESSION['gagal'] = "Gagal memperbarui status: " . $koneksi->error;
+        header("Location: orders.php");
+        exit;
     }
 }
 
@@ -415,6 +419,7 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
     </div>
 
     <?php include 'modal_logout.php'; ?>
+    <?php include 'modal_notifikasi.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
