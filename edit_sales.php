@@ -15,13 +15,22 @@ $data = $ambildata->fetch_assoc();
 
 // Jika sales tidak ditemukan
 if (!$data) {
-    echo "<script>alert('Data sales tidak ditemukan!'); window.location='sales.php';</script>";
+    $_SESSION['gagal'] = "Data sales tidak ditemukan!";
+    header("Location: sales.php");
     exit;
 }
 
 if (isset($_POST['update_sales'])) {
     $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $username = mysqli_real_escape_string($koneksi, $_POST['username']);
+
+    // Cek apakah username sudah dipakai akun lain
+    $cek = $koneksi->query("SELECT id_user FROM users WHERE username = '$username' AND id_user != '$id'");
+    if ($cek->num_rows > 0) {
+        $_SESSION['gagal'] = "Username sudah digunakan akun lain!";
+        header("Location: sales.php");
+        exit;
+    }
 
     // Logika jika password juga diganti
     if (!empty($_POST['password'])) {
@@ -32,9 +41,13 @@ if (isset($_POST['update_sales'])) {
     }
 
     if ($koneksi->query($query)) {
-        echo "<script>alert('Data sales diperbarui!'); window.location='sales.php';</script>";
+        $_SESSION['sukses'] = "Data sales berhasil diperbarui!";
+        header("Location: sales.php");
+        exit;
     } else {
-        echo "Error: " . $koneksi->error;
+        $_SESSION['gagal'] = "Error: " . $koneksi->error;
+        header("Location: sales.php");
+        exit;
     }
 }
 ?>
@@ -78,6 +91,9 @@ if (isset($_POST['update_sales'])) {
             </div>
         </div>
     </div>
+    
+    <?php include 'modal_notifikasi.php'; ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

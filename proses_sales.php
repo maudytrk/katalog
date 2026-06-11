@@ -17,15 +17,21 @@ if (isset($_POST['tambah_sales'])) {
     // Cek apakah username sudah dipakai
     $cek = $koneksi->query("SELECT * FROM users WHERE username = '$username'");
     if ($cek->num_rows > 0) {
-        echo "<script>alert('Username sudah terdaftar!'); window.location='sales.php';</script>";
+        $_SESSION['gagal'] = "Username sudah terdaftar!";
+        header("Location: sales.php");
+        exit;
     } else {
         $query = "INSERT INTO users (nama_lengkap, username, password, role) 
                   VALUES ('$nama', '$username', '$password', '$role')";
 
         if ($koneksi->query($query)) {
-            echo "<script>alert('Sales baru berhasil didaftarkan!'); window.location='sales.php';</script>";
+            $_SESSION['sukses'] = "Sales baru berhasil didaftarkan!";
+            header("Location: sales.php");
+            exit;
         } else {
-            echo "Error: " . $koneksi->error;
+            $_SESSION['gagal'] = "Error: " . $koneksi->error;
+            header("Location: sales.php");
+            exit;
         }
     }
 }

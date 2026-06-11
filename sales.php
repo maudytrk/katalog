@@ -18,7 +18,9 @@ if (isset($_POST['update_sales'])) {
     // Cek apakah username sudah dipakai akun lain
     $cek = $koneksi->query("SELECT id_user FROM users WHERE username = '$username' AND id_user != '$id_user'");
     if ($cek->num_rows > 0) {
-        echo "<script>alert('Username sudah digunakan akun lain!'); window.location='sales.php';</script>";
+        $_SESSION['gagal'] = "Username sudah digunakan akun lain!";
+        header("Location: sales.php");
+        exit;
     } else {
         if (!empty($password_baru)) {
             // Update beserta password baru
@@ -28,7 +30,9 @@ if (isset($_POST['update_sales'])) {
             // Update tanpa mengganti password lama
             $koneksi->query("UPDATE users SET nama_lengkap = '$nama_lengkap', username = '$username' WHERE id_user = '$id_user'");
         }
-        echo "<script>alert('Data akun sales berhasil diperbarui!'); window.location='sales.php';</script>";
+        $_SESSION['sukses'] = "Data akun sales berhasil diperbarui!";
+        header("Location: sales.php");
+        exit;
     }
 }
 
@@ -40,9 +44,13 @@ if (isset($_GET['hapus'])) {
     $cek_sales = $koneksi->query("SELECT id_user FROM users WHERE id_user = '$id' AND role = 'sales'");
     if ($cek_sales->num_rows > 0) {
         $koneksi->query("DELETE FROM users WHERE id_user = '$id' AND role = 'sales'");
-        echo "<script>alert('Akun sales berhasil dihapus'); window.location='sales.php';</script>";
+        $_SESSION['sukses'] = "Akun sales berhasil dihapus!";
+        header("Location: sales.php");
+        exit;
     } else {
-        echo "<script>alert('Akun sales tidak ditemukan atau Anda tidak memiliki akses!'); window.location='sales.php';</script>";
+        $_SESSION['gagal'] = "Akun sales tidak ditemukan atau Anda tidak memiliki akses!";
+        header("Location: sales.php");
+        exit;
     }
 }
 
@@ -480,6 +488,7 @@ $totalOrder = $koneksi->query("SELECT COUNT(*) as total FROM orders")->fetch_ass
 
     <?php include 'modal_logout.php'; ?>
     <?php include 'modal_konfirmasi_hapus.php'; ?>
+    <?php include 'modal_notifikasi.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
