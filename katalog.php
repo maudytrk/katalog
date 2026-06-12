@@ -269,7 +269,7 @@ $result = $koneksi->query($sql);
         <div class="modal fade" id="modalOrderCepat" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
-                    <form action="proses_order_cepat.php" method="POST">
+                    <form id="orderForm">
                         <div class="modal-header border-0" style="background-color: var(--bg-lavender); border-radius: 1rem 1rem 0 0;">
                             <h5 class="modal-title fw-bold" style="color: var(--accent-indigo);"><i class="fas fa-bolt text-warning me-2"></i>Form Pesanan Sales</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -394,6 +394,29 @@ $result = $koneksi->query($sql);
             <div class="modal-footer border-0 justify-content-center pb-4">
                 <button type="button" class="btn px-4 rounded-pill text-white fw-bold shadow-sm" style="background-color: var(--accent-indigo);" data-bs-dismiss="modal">
                     <i class="fas fa-check me-2"></i>Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Modal Notifikasi Sistem -->
+<div class="modal fade" id="systemNotificationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0" id="notificationModalHeader" style="border-radius: 1rem 1rem 0 0;">
+                <h5 class="modal-title fw-bold text-white" id="notificationModalTitle">
+                    <i class="fas fa-info-circle me-2"></i>Notifikasi
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center" id="notificationModalBody">
+                <i class="fas fa-circle-info fa-3x mb-3" id="notificationIcon" style="color: var(--accent-plum);"></i>
+                <p class="mb-0 fs-6" id="notificationMessage">Pesan notifikasi akan ditampilkan di sini.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn px-4 rounded-pill text-white fw-bold shadow-sm" style="background-color: var(--accent-indigo);" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>OK
                 </button>
             </div>
         </div>
@@ -537,138 +560,274 @@ $result = $koneksi->query($sql);
     <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const orderForm = document.querySelector('form[action="proses_order_cepat.php"]');
-
-            if (orderForm) {
-                orderForm.addEventListener("submit", async function(e) {
-                    e.preventDefault();
-
-                    const btnSubmit = orderForm.querySelector('button[type="submit"]');
-                    const teksAsli = btnSubmit ? btnSubmit.innerHTML : "Simpan Transaksi";
-
-                    if (btnSubmit) {
-                        btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
-                        btnSubmit.disabled = true;
-                    }
-
-                    const formData = new FormData(orderForm);
-                    const dataOrder = Object.fromEntries(formData.entries());
-                    dataOrder.tanggal = new Date().toISOString();
-                    dataOrder.id_lokal = Date.now(); // Kunci identitas unik untuk memori lokal
-
-                    if (navigator.onLine) {
-                        try {
-                            const response = await fetch("/katalog/proses_order_cepat.php", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(dataOrder)
-                            });
-
-                            const textResponse = await response.text();
-
-                            try {
-                                const result = JSON.parse(textResponse);
-                                if (result.status === "success") {
-                                    alert(result.message);
-                                    window.location.reload();
-                                } else {
-                                    alert("Gagal: " + result.message);
-                                    resetTombol(btnSubmit, teksAsli);
-                                }
-                            } catch (parseError) {
-                                alert("Terjadi kesalahan pada sistem server PHP.");
-                                resetTombol(btnSubmit, teksAsli);
-                            }
-                        } catch (error) {
-                            simpanPesananLokal(dataOrder, btnSubmit, teksAsli);
-                        }
-                    } else {
-                        simpanPesananLokal(dataOrder, btnSubmit, teksAsli);
-                    }
-                });
+// ========== SCRIPT 2: OFFLINE ORDER SYSTEM ==========
+function initOfflineSystem() {
+    
+    console.log('SCRIPT 2: Memulai inisialisasi offline system...');
+    
+    const formatRupiah = (number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(number);
+    };
+    
+    let activeController = null;
+    const orderFormElement = document.getElementById('orderForm');
+    
+    if (!orderFormElement) {
+        console.error('ERROR: Form dengan id "orderForm" TIDAK DITEMUKAN!');
+        return;
+    }
+    
+    console.log('FORM DITEMUKAN!');
+    
+    // Fungsi Modal Notifikasi - TANPA ALERT
+    function showNotificationModal(title, message, type = 'info') {
+        console.log('MENAMPILKAN NOTIFIKASI:', title, message, type);
+        
+        const modalElement = document.getElementById('systemNotificationModal');
+        if (!modalElement) {
+            console.error('Modal notifikasi tidak ditemukan!');
+            return;
+        }
+        
+        try {
+            const modalTitle = document.getElementById('notificationModalTitle');
+            const modalHeader = document.getElementById('notificationModalHeader');
+            const notificationIcon = document.getElementById('notificationIcon');
+            const notificationMessage = document.getElementById('notificationMessage');
+            
+            if (!modalTitle || !modalHeader || !notificationIcon || !notificationMessage) {
+                console.error('Elemen modal tidak lengkap!');
+                return;
             }
+            
+            modalHeader.className = 'modal-header border-0';
+            modalHeader.style.borderRadius = '1rem 1rem 0 0';
 
-            function resetTombol(btnSubmit, teksAsli) {
-                if (btnSubmit) {
-                    btnSubmit.innerHTML = teksAsli;
-                    btnSubmit.disabled = false;
-                }
+            const colors = {
+                success: { bg: '#28a745', icon: 'fa-check-circle' },
+                error: { bg: '#dc3545', icon: 'fa-exclamation-circle' },
+                warning: { bg: '#ffc107', icon: 'fa-exclamation-triangle' },
+                info: { bg: 'var(--accent-plum)', icon: 'fa-circle-info' }
+            };
+            const style = colors[type] || colors.info;
+            
+            modalHeader.style.backgroundColor = style.bg;
+            notificationIcon.className = `fas ${style.icon} fa-3x mb-3`;
+            notificationIcon.style.color = style.bg;
+            modalTitle.innerHTML = `<i class="fas ${style.icon} me-2"></i>${title}`;
+            notificationMessage.innerHTML = message;
+            
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            if (type === 'info' || type === 'success') {
+                setTimeout(() => {
+                    try { modal.hide(); } catch(e) {}
+                }, 3000);
             }
-
-            // FUNGSI BARU: Menyimpan pesanan tanpa IndexedDB (Sangat Ringan & Aman)
-            function simpanPesananLokal(data, btnSubmit, teksAsli) {
-                try {
-                    // Ambil data lama atau buat ruang kosong baru
-                    let pesananOffline = JSON.parse(localStorage.getItem("offlineOrders")) || [];
-
-                    // Masukkan pesanan baru
-                    pesananOffline.push(data);
-
-                    // Simpan kembali ke dalam brankas peramban
-                    localStorage.setItem("offlineOrders", JSON.stringify(pesananOffline));
-
-                    alert("MODE OFFLINE AKTIF. Transaksi tersimpan aman di memori perangkat. Sistem akan mengirim data saat internet menyala.");
-                    window.location.reload();
-                } catch (err) {
-                    alert("Penyimpanan luring gagal. Memori peramban mungkin penuh.");
-                    resetTombol(btnSubmit, teksAsli);
-                }
-            }
-
-            // FUNGSI BARU: Sinkronisasi super cepat
-            async function prosesSinkronisasi() {
-                let pesananOffline = JSON.parse(localStorage.getItem("offlineOrders")) || [];
-                if (pesananOffline.length === 0) return;
-
-                let berhasilSync = 0;
-                let sisaPesanan = []; // Untuk menampung pesanan yang gagal terkirim (misal karena sinyal putus nyambung)
-
-                for (const order of pesananOffline) {
-                    try {
-                        const response = await fetch("/katalog/proses_order_cepat.php", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(order)
-                        });
-                        const textResponse = await response.text();
-
-                        try {
-                            const result = JSON.parse(textResponse);
-                            if (result.status === "success") {
-                                berhasilSync++;
-                            } else {
-                                // Jika server PHP menolak (misal stok habis), data tetap dihapus agar tidak nyangkut
-                                console.error("Ditolak server:", result.message);
-                            }
-                        } catch (e) {
-                            sisaPesanan.push(order); // Pertahankan data jika PHP error
-                        }
-                    } catch (e) {
-                        sisaPesanan.push(order); // Pertahankan data jika internet kembali mati
-                    }
-                }
-
-                // Perbarui isi brankas peramban (Hapus yang sukses, simpan yang masih tertunda)
-                localStorage.setItem("offlineOrders", JSON.stringify(sisaPesanan));
-
-                if (berhasilSync > 0) {
-                    alert(`SINKRONISASI SUKSES: ${berhasilSync} data pesanan luring telah berhasil disalurkan ke sistem pusat.`);
-                    window.location.reload();
-                }
-            }
-
-            // Deteksi otomatis saat internet kembali menyala
-            window.addEventListener("online", prosesSinkronisasi);
-            if (navigator.onLine) {
-                prosesSinkronisasi();
+        } catch (err) {
+            console.error('Error menampilkan modal:', err);
+        }
+    }
+    
+    // Reset form lengkap
+    function resetOrderFormComplete() {
+        if (!orderFormElement) return;
+        const textInputs = orderFormElement.querySelectorAll('input[type="text"], input[type="number"]');
+        textInputs.forEach(input => {
+            if (input.name === 'jumlah_beli') {
+                input.value = '1';
+            } else {
+                input.value = '';
             }
         });
-    </script>
+        const hargaSatuan = document.getElementById('input-harga-satuan').value;
+        const totalDisplay = document.getElementById('display-total-bayar');
+        if (totalDisplay && hargaSatuan) {
+            totalDisplay.textContent = formatRupiah(parseInt(hargaSatuan));
+        }
+        const errorMsg = document.getElementById('error-msg-order');
+        if (errorMsg) errorMsg.style.display = 'none';
+    }
+    
+    // Tutup modal order
+    function closeOrderModal() {
+        const modalElement = document.getElementById('modalOrderCepat');
+        if (modalElement) {
+            try {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) modal.hide();
+            } catch(err) {}
+        }
+    }
+    
+    // Simpan offline
+    function simpanPesananOffline(data, btnSubmit, teksAsli) {
+        try {
+            let pesananOffline = JSON.parse(localStorage.getItem("offlineOrders") || "[]");
+            const sudahAda = pesananOffline.some(p => p.id_lokal === data.id_lokal);
+            if (sudahAda) {
+                showNotificationModal('Info', 'Pesanan sudah tersimpan sebelumnya.', 'info');
+                resetTombol(btnSubmit, teksAsli);
+                return;
+            }
+            pesananOffline.push(data);
+            localStorage.setItem("offlineOrders", JSON.stringify(pesananOffline));
+            
+            showNotificationModal('Mode Offline', '✓ Pesanan BERHASIL tersimpan di perangkat Anda.', 'success');
+            closeOrderModal();
+            resetOrderFormComplete();
+            resetTombol(btnSubmit, teksAsli);
+            
+        } catch (err) {
+            console.error('Error simpan offline:', err);
+            showNotificationModal('Gagal Simpan', 'Penyimpanan gagal: ' + err.message, 'error');
+            resetTombol(btnSubmit, teksAsli);
+        }
+    }
+    
+    function resetTombol(btn, teks) {
+        if (btn) {
+            btn.innerHTML = teks;
+            btn.disabled = false;
+        }
+    }
+    
+    // Handle submit form
+    let isSubmitting = false;
+    
+    orderFormElement.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        
+        if (isSubmitting) {
+            showNotificationModal('Info', 'Proses sedang berjalan. Harap tunggu...', 'info');
+            return;
+        }
+        
+        isSubmitting = true;
+        const btnSubmit = document.getElementById('btn-submit-order');
+        const teksAsli = btnSubmit ? btnSubmit.innerHTML : "Simpan Transaksi";
+        
+        const namaPelanggan = document.querySelector('input[name="nama_pelanggan"]').value.trim();
+        const noHp = document.querySelector('input[name="no_hp"]').value.trim();
+        const jumlahBeli = document.querySelector('input[name="jumlah_beli"]').value;
+        
+        if (!namaPelanggan || !noHp || !jumlahBeli) {
+            showNotificationModal('Validasi Gagal', 'Semua field harus diisi!', 'error');
+            isSubmitting = false;
+            return;
+        }
+        
+        const formData = new FormData(orderFormElement);
+        const dataOrder = Object.fromEntries(formData.entries());
+        dataOrder.tanggal = new Date().toISOString();
+        dataOrder.id_lokal = Date.now() + Math.random();
+        
+        // OFFLINE MODE
+        if (!navigator.onLine) {
+            simpanPesananOffline(dataOrder, btnSubmit, teksAsli);
+            isSubmitting = false;
+            return;
+        }
+        
+        // ONLINE MODE
+        if (btnSubmit) {
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+            btnSubmit.disabled = true;
+        }
+        
+        activeController = new AbortController();
+        try {
+            const response = await fetch("proses_order_cepat.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dataOrder),
+                signal: activeController.signal
+            });
+            const result = await response.json();
+            
+            if (result.status === "success") {
+                showNotificationModal('Berhasil!', result.message, 'success');
+                closeOrderModal();
+                resetOrderFormComplete();
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showNotificationModal('Gagal!', result.message, 'error');
+                resetTombol(btnSubmit, teksAsli);
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                showNotificationModal('Dibatalkan', 'Proses dibatalkan.', 'info');
+                resetTombol(btnSubmit, teksAsli);
+            } else {
+                simpanPesananOffline(dataOrder, btnSubmit, teksAsli);
+            }
+        }
+        activeController = null;
+        isSubmitting = false;
+    });
+    
+    // Sinkronisasi offline
+    async function sinkronisasiOffline() {
+        let pesananOffline = JSON.parse(localStorage.getItem("offlineOrders") || "[]");
+        if (pesananOffline.length === 0) return;
+        
+        showNotificationModal('Sinkronisasi', `Menyinkronkan ${pesananOffline.length} data...`, 'info');
+        let berhasil = 0, sisa = [];
+        
+        for (const order of pesananOffline) {
+            try {
+                const response = await fetch("proses_order_cepat.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(order)
+                });
+                const result = await response.json();
+                if (result.status === "success") berhasil++;
+                else sisa.push(order);
+            } catch (e) {
+                sisa.push(order);
+            }
+        }
+        
+        localStorage.setItem("offlineOrders", JSON.stringify(sisa));
+        if (berhasil > 0) {
+            showNotificationModal('Sinkronisasi', `${berhasil} data berhasil disinkronkan.`, 'success');
+            if (sisa.length === 0) setTimeout(() => location.reload(), 1500);
+        }
+    }
+    
+    // Event koneksi
+    let offlineShown = false;
+    window.addEventListener("offline", () => {
+        if (!offlineShown) {
+            showNotificationModal('Mode Offline', 'Anda offline. Pesanan akan disimpan sementara.', 'warning');
+            offlineShown = true;
+        }
+    });
+    window.addEventListener("online", () => {
+        offlineShown = false;
+        showNotificationModal('Online', 'Koneksi kembali. Menyinkronkan...', 'success');
+        sinkronisasiOffline();
+    });
+    
+    if (!navigator.onLine) {
+        showNotificationModal('Mode Offline', 'Anda offline. Pesanan akan disimpan sementara.', 'warning');
+    } else {
+        sinkronisasiOffline();
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOfflineSystem);
+} else {
+    initOfflineSystem();
+}
+</script>
 
 </body>
 
