@@ -173,33 +173,6 @@ $today = date('Y-m-d');
 
     <?php if (empty($_GET['search'])): ?>
 
-        <section class="py-4 bg-transparent mb-4">
-            <div class="container px-4 px-lg-5">
-                <div class="row align-items-center shadow-sm rounded-4 p-4 p-md-5" style="background-color: white; border: 1px solid var(--bg-lavender);">
-                    <div class="col-lg-7 mb-4 mb-lg-0">
-                        <span class="badge px-3 py-2 rounded-pill mb-3" style="background-color: var(--accent-plum); color: white;">Tentang Kami</span>
-                        <h2 class="fw-bold mb-3" style="color: var(--accent-indigo);">PT Rahayu Karunia Utama</h2>
-                        <p class="text-muted mb-4" style="line-height: 1.8;">
-                            Menjadi brand pakaian dalaman harian wanita terpercaya yang menghadirkan kenyamanan serta berkualitas dengan harga yang terjangkau bagi seluruh masyarakat Indonesia. Setiap produk kami dibuat dengan perhatian terhadap kualitas dan diproduksi bersama mitra konveksi UMKM lokal berpengalaman. Kepuasan pelanggan menjadi motivasi kami untuk terus berkembang dan memberikan yang terbaik.
-                        </p>
-
-                        <p class="text-muted mb-4" style="line-height: 1.8;">
-                            Kami berharap katalog ini membantu Anda menemukan produk yang sesuai dengan kebutuhan. Apabila Anda memiliki pertanyaan atau membutuhkan informasi lebih lanjut, kami siap membantu dengan senang hati.
-                        </p>
-
-                        <p class="text-muted mb-4" style="line-height: 1.8;">
-                            Terima kasih atas kepercayaan Anda kepada Rahayu. Semoga kami selalu menjadi pilihan terbaik untuk kebutuhan pakaian dalaman harian Anda.
-                        </p>
-
-                        <a href="katalog.php" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Jelajahi Koleksi</a>
-                    </div>
-                    <div class="col-lg-5 text-center">
-                        <img src="assets/img/logorahayu.png" alt="PT Rahayu" class="img-fluid rounded" style="max-height: 200px; object-fit: contain;">
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <?php
         $promo_query = "SELECT p.*, GROUP_CONCAT(k.nama_kategori SEPARATOR ', ') as daftar_kategori, pr.diskon_persen 
                         FROM produk p 
@@ -413,6 +386,33 @@ $today = date('Y-m-d');
                     echo "<div class='col-12 text-center py-5'><div class='p-5 rounded-4 shadow-sm' style='background-color: var(--bg-lavender);'><i class='bi bi-search display-4 text-muted mb-3'></i><p class='text-muted fw-bold'>Produk yang Anda cari tidak ditemukan.</p></div></div>";
                 }
                 ?>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-4 bg-transparent mb-4">
+        <div class="container px-4 px-lg-5">
+            <div class="row align-items-center shadow-sm rounded-4 p-4 p-md-5" style="background-color: white; border: 1px solid var(--bg-lavender);">
+                <div class="col-lg-7 mb-4 mb-lg-0">
+                    <span class="badge px-3 py-2 rounded-pill mb-3" style="background-color: var(--accent-plum); color: white;">Tentang Kami</span>
+                    <h2 class="fw-bold mb-3" style="color: var(--accent-indigo);">PT Rahayu Karunia Utama</h2>
+                    <p class="text-muted mb-4" style="line-height: 1.8;">
+                        Menjadi brand pakaian dalaman harian wanita terpercaya yang menghadirkan kenyamanan serta berkualitas dengan harga yang terjangkau bagi seluruh masyarakat Indonesia. Setiap produk kami dibuat dengan perhatian terhadap kualitas dan diproduksi bersama mitra konveksi UMKM lokal berpengalaman. Kepuasan pelanggan menjadi motivasi kami untuk terus berkembang dan memberikan yang terbaik.
+                    </p>
+
+                    <p class="text-muted mb-4" style="line-height: 1.8;">
+                        Kami berharap katalog ini membantu Anda menemukan produk yang sesuai dengan kebutuhan. Apabila Anda memiliki pertanyaan atau membutuhkan informasi lebih lanjut, kami siap membantu dengan senang hati.
+                    </p>
+
+                    <p class="text-muted mb-4" style="line-height: 1.8;">
+                        Terima kasih atas kepercayaan Anda kepada Rahayu. Semoga kami selalu menjadi pilihan terbaik untuk kebutuhan pakaian dalaman harian Anda.
+                    </p>
+
+                    <a href="katalog.php" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Jelajahi Koleksi</a>
+                </div>
+                <div class="col-lg-5 text-center">
+                    <img src="assets/img/logorahayu.png" alt="PT Rahayu" class="img-fluid rounded" style="max-height: 200px; object-fit: contain;">
+                </div>
             </div>
         </div>
     </section>

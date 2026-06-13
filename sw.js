@@ -5,6 +5,8 @@ const urlsToCache = [
   "./index.php",
   "./katalog.php",
   "./detail.php",
+  "/bandingkan.php", //
+  "/katalog_promo.php",
   "./css/styles.css",
   "./js/scripts.js",
   "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",

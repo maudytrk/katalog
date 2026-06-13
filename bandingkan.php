@@ -506,18 +506,18 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
                     </div>
                     <div id="contact" class="col-md-6 text-md-end">
                         <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
-                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
-                            <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
-                        </a><br>
-                        <a href="https://www.instagram.com/rahayuofficialstore" target="_blank" class="contact-link contact-link-ig">
-                            <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore
-                        </a><br>
-                        <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
-                            <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
-                        </a><br>
-                    </p>
+                        <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
+                            <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
+                            <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
+                                <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
+                            </a><br>
+                            <a href="https://www.instagram.com/rahayuofficialstore" target="_blank" class="contact-link contact-link-ig">
+                                <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore
+                            </a><br>
+                            <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
+                                <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
+                            </a><br>
+                        </p>
                     </div>
                 </div>
                 <hr class="mt-4 mb-3 border-secondary">
@@ -526,32 +526,32 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
         </footer>
     <?php else : ?>
         <footer class="py-5">
-        <div class="container">
-            <div class="row">
-                <div id="about" class="col-md-6 mb-4 mb-md-0">
-                    <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+            <div class="container">
+                <div class="row">
+                    <div id="about" class="col-md-6 mb-4 mb-md-0">
+                        <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
+                        <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+                    </div>
+                    <div id="contact" class="col-md-6 text-md-end">
+                        <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
+                        <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
+                            <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
+                            <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
+                                <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
+                            </a><br>
+                            <a href="https://www.instagram.com/rahayuofficialstore" target="_blank" class="contact-link contact-link-ig">
+                                <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore
+                            </a><br>
+                            <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
+                                <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
+                            </a><br>
+                        </p>
+                    </div>
                 </div>
-                <div id="contact" class="col-md-6 text-md-end">
-                    <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
-                        <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
-                            <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
-                        </a><br>
-                        <a href="https://www.instagram.com/rahayuofficialstore" target="_blank" class="contact-link contact-link-ig">
-                            <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore
-                        </a><br>
-                        <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
-                            <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
-                        </a><br>
-                    </p>
-                </div>
+                <hr class="mt-4 mb-3">
+                <p class="m-0 text-center small opacity-75 text-white">&copy; <?php echo date('Y'); ?> E-Catalogue Toko Rahayu. All Rights Reserved.</p>
             </div>
-            <hr class="mt-4 mb-3">
-            <p class="m-0 text-center small opacity-75 text-white">&copy; <?php echo date('Y'); ?> E-Catalogue Toko Rahayu. All Rights Reserved.</p>
-        </div>
-    </footer>
+        </footer>
     <?php endif; ?>
     <?php include 'modal_logout.php'; ?>
 
@@ -612,6 +612,71 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
                 });
             });
         });
+    </script>
+
+    <div id="tabelPerbandingan" class="table-responsive">
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let listBanding = JSON.parse(localStorage.getItem("listBanding")) || [];
+            // Log 1: Memeriksa isi data asli di memori peramban
+            console.log("ID Produk di localStorage:", listBanding);
+
+            if (listBanding.length > 0) {
+                fetch('get_produk_banding.php', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            ids: listBanding
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(res => {
+                        // Log 2: Memeriksa respon balik dari sistem PHP
+                        console.log("Respon penuh dari server:", res);
+
+                        if (res.status === 'success' && res.products.length > 0) {
+                            let data = res.products;
+                            let html = '<table class="table table-bordered text-center">';
+
+                            // Baris Nama Produk
+                            html += '<tr><th class="bg-light" style="width: 200px;">Nama Produk</th>';
+                            data.forEach(produk => {
+                                html += `<td><strong>${produk.nama_produk}</strong></td>`;
+                            });
+                            html += '</tr>';
+
+                            // Baris Harga
+                            html += '<tr><th class="bg-light">Harga</th>';
+                            data.forEach(produk => {
+                                html += `<td>${produk.harga_format}</td>`;
+                            });
+                            html += '</tr>';
+
+                            html += '</table>';
+                            html += '<button class="btn btn-danger btn-sm mt-2" onclick="hapusBanding()">Kosongkan Perbandingan</button>';
+
+                            document.getElementById('tabelPerbandingan').innerHTML = html;
+                        } else {
+                            document.getElementById('tabelPerbandingan').innerHTML = "<p class='alert alert-warning'>Data produk tidak ditemukan di pangkalan data peladen pusat.</p>";
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Fetch Error:", err);
+                        document.getElementById('tabelPerbandingan').innerHTML = "<p class='alert alert-danger'>Terjadi kesalahan koneksi sistem.</p>";
+                    });
+            } else {
+                document.getElementById('tabelPerbandingan').innerHTML = "<p class='text-muted'>Belum ada produk yang dipilih untuk dibandingkan.</p>";
+            }
+        });
+
+        function hapusBanding() {
+            localStorage.removeItem("listBanding");
+            window.location.reload();
+        }
     </script>
 </body>
 
