@@ -431,8 +431,8 @@ $today = date('Y-m-d');
                         <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
                             <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
                         </a><br>
-                        <a href="https://www.instagram.com/rahayuofficialstore" target="_blank" class="contact-link contact-link-ig">
-                            <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore
+                        <a href="https://www.instagram.com/rahayuofficialstore.id" target="_blank" class="contact-link contact-link-ig">
+                            <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore.id
                         </a><br>
                         <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
                             <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
