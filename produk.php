@@ -577,8 +577,7 @@ if (isset($_POST['update'])) {
     <?php include 'modal_konfirmasi_hapus.php'; ?>
     <?php include 'modal_logout.php'; ?>
     <?php include 'modal_notifikasi.php'; ?>
-    <?php include 'modal_konfirmasi_hapus_foto.php'; ?>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
