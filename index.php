@@ -38,17 +38,54 @@ $today = date('Y-m-d');
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Hero Section dengan Gradient Animasi Halus */
+        /* Hero Section dengan Gradient Animasi Halus - Menggunakan Background Lokal */
         .hero-section {
-            background: linear-gradient(rgba(36, 31, 72, 0.75), rgba(108, 71, 115, 0.65)), url('https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background: linear-gradient(rgba(36, 31, 72, 0.85), rgba(108, 71, 115, 0.8)); /* Gelapkan gradient */
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            /* Parallax Effect */
             padding: 140px 0 100px 0;
             color: white;
             margin-top: -85px;
-            /* Menarik hero ke atas agar navbar glassmorphism terlihat menumpuk */
+            position: relative;
+        }
+
+        /* Background image menggunakan pseudo-element */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('assets/img/hero_section_katalog.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: 1;
+            opacity: 0.4; /* Tambahkan ini untuk mengatur kegelapan gambar (0=transparan, 1=full) */
+        }
+
+        /* Tambahkan overlay gelap tambahan jika perlu */
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3); /* Overlay hitam transparan */
+            z-index: 1;
+        }
+
+        /* Jika gambar tidak ditemukan, fallback ke warna solid */
+        .hero-section {
+            background-color: var(--accent-indigo);
+        }
+
+        .hero-section .container {
+            position: relative;
+            z-index: 2;
         }
 
         .btn-primary {
@@ -155,6 +192,7 @@ $today = date('Y-m-d');
             <a href="katalog.php" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold"><i class="bi bi-cart3 me-2"></i>Jelajahi Katalog</a>
         </div>
     </header>
+
 
     <div class="container search-bar mb-5" style="margin-top: -45px; position: relative; z-index: 10;">
         <div class="card border-0">
@@ -461,6 +499,23 @@ $today = date('Y-m-d');
             </div>
         </div>
     </div>
+
+    <!-- Add JavaScript untuk fallback gambar hero jika diperlukan -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Cek apakah gambar hero ada, jika tidak, tambahkan fallback warna
+        const heroSection = document.querySelector('.hero-section');
+        const heroBg = document.querySelector('.hero-section::before');
+        
+        // Alternative: Cek dengan JavaScript jika gambar gagal load
+        const testImg = new Image();
+        testImg.src = 'assets/img/hero_section_katalog.png';
+        testImg.onerror = function() {
+            // Jika gambar tidak ditemukan, background akan tetap menggunakan gradient dari CSS
+            console.log('Hero background image not found, using gradient fallback');
+        };
+    });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
