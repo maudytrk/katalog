@@ -121,12 +121,12 @@ $nama_user = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Pengguna';
 
             <?php if (!$is_login) : ?>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link" href="index.php#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php#home"><i class="fas fa-home me-1"></i>Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php#populer"><i class="fas fa-fire text-danger me-1"></i> Terpopuler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="katalog.php">Katalog Produk</a></li>
-                    <li class="nav-item"><a class="nav-link" href="katalog_promo.php">Promo & Diskon</a></li>
-                    <li class="nav-item"><a class="nav-link" href="bandingkan.php">Bandingkan</a></li>
-                    <li class="nav-item"><a class="nav-link" href="lacak_pesanan.php">Lacak Pesanan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="katalog.php"><i class="fas fa-box me-1"></i>Katalog Produk</a></li>
+                    <li class="nav-item"><a class="nav-link" href="katalog_promo.php"><i class="fas fa-tags me-1"></i>Promo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="bandingkan.php"><i class="fas fa-balance-scale me-1"></i>Bandingkan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="lacak_pesanan.php"><i class="fas fa-search-location me-1"></i>Lacak Pesanan</a></li>
                 </ul>
                 <div class="d-flex align-items-center mt-3 mt-lg-0">
                     <a href="login.php" class="btn btn-login-admin px-4 py-2">
