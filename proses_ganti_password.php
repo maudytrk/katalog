@@ -15,13 +15,17 @@ if (isset($_POST['submit_ganti_password'])) {
 
     // Cek apakah password baru sama dengan kolom konfirmasinya
     if ($password_baru !== $konfirmasi_password) {
-        echo "<script>alert('Gagal! Konfirmasi password tidak cocok dengan password baru.'); window.history.back();</script>";
+        $_SESSION['password_status'] = 'error';
+        $_SESSION['password_message'] = 'Konfirmasi password tidak cocok dengan password baru!';
+        header("Location: " . $_SERVER['HTTP_REFERER']);
         exit;
     }
 
     // Cek minimal panjang karakter (6 Karakter)
     if (strlen($password_baru) < 6) {
-        echo "<script>alert('Gagal! Password baru minimal harus 6 karakter!'); window.history.back();</script>";
+        $_SESSION['password_status'] = 'error';
+        $_SESSION['password_message'] = 'Password baru minimal harus 6 karakter!';
+        header("Location: " . $_SERVER['HTTP_REFERER']);
         exit;
     }
 
@@ -32,13 +36,16 @@ if (isset($_POST['submit_ganti_password'])) {
     $update = mysqli_query($koneksi, "UPDATE users SET password = '$password_hash' WHERE id_user = '$id_user'");
 
     if ($update) {
-        // Jika berhasil, paksa user untuk logout agar login kembali menggunakan password baru
-        echo "<script>
-                alert('Berhasil! Password Anda telah diubah. Silakan login kembali dengan password baru.'); 
-                window.location.href = 'logout.php';
-              </script>";
+        // Jika berhasil, simpan ke session dan redirect ke halaman sebelumnya
+        $_SESSION['password_status'] = 'success';
+        $_SESSION['password_message'] = 'Password Anda telah berhasil diubah. Silakan login kembali dengan password baru.';
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit;
     } else {
-        echo "<script>alert('Terjadi kesalahan sistem, gagal mengubah password!'); window.history.back();</script>";
+        $_SESSION['password_status'] = 'error';
+        $_SESSION['password_message'] = 'Terjadi kesalahan sistem, gagal mengubah password!';
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit;
     }
 } else {
     header("Location: index.php");

@@ -209,6 +209,72 @@ if ($is_login) {
 } 
 ?>
 
+<!-- Modal Peringatan Sukses -->
+<div class="modal fade" id="modalSuccess" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Berhasil!</h5>
+                <p class="text-muted mb-4" id="successDetail">Password Anda telah diubah.</p>
+                <button type="button" class="btn btn-success rounded-pill px-4" id="btnSuccessRedirect">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Peringatan Error -->
+<div class="modal fade" id="modalError" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Gagal!</h5>
+                <p class="text-muted mb-4" id="errorMessage">Terjadi kesalahan</p>
+                <button type="button" class="btn btn-danger rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script untuk menampilkan modal berdasarkan session
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if(isset($_SESSION['password_status']) && !empty($_SESSION['password_status'])): ?>
+        const status = '<?php echo $_SESSION['password_status']; ?>';
+        const message = '<?php echo $_SESSION['password_message']; ?>';
+        
+        <?php 
+        $_SESSION['password_status'] = '';
+        $_SESSION['password_message'] = '';
+        ?>
+        
+        if (status === 'success') {
+            const successDetail = document.getElementById('successDetail');
+            if (successDetail) successDetail.innerText = message;
+            const successModal = new bootstrap.Modal(document.getElementById('modalSuccess'));
+            successModal.show();
+            
+            const btnRedirect = document.getElementById('btnSuccessRedirect');
+            if (btnRedirect) {
+                btnRedirect.onclick = function() {
+                    window.location.href = 'logout.php';
+                };
+            }
+        } else if (status === 'error') {
+            const errorMsg = document.getElementById('errorMessage');
+            if (errorMsg) errorMsg.innerText = message;
+            const errorModal = new bootstrap.Modal(document.getElementById('modalError'));
+            errorModal.show();
+        }
+    <?php endif; ?>
+});
+</script>
+
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
