@@ -17,11 +17,22 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Menerima aliran data JSON dari Fetch API PWA
-$inputJSON = file_get_contents('php://input');
-$data = json_decode($inputJSON, TRUE);
+// ==========================================
+// PENANGANAN MULTI-FORMAT REQUEST
+// ==========================================
+$contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+$data = [];
 
-if ($data) {
+// Mengecek apakah request berformat JSON atau Form Standar
+if (strpos($contentType, 'application/json') !== false) {
+    $inputJSON = file_get_contents('php://input');
+    $data = json_decode($inputJSON, TRUE);
+} else {
+    $data = $_POST;
+}
+
+// Lanjutkan pemrosesan jika ada data yang masuk
+if (!empty($data)) {
 
     // AKTIFKAN REPORT EXCEPTION MYSQLI
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -93,19 +104,18 @@ if ($data) {
             'id_order' => $id_order_baru
         ]);
         exit;
-    } catch (\Exception $e) { // Tambahkan garis miring terbalik di sini
+    } catch (\Exception $e) { 
         $koneksi->rollback();
         $pesan_error = $e->getMessage();
 
         if ($pesan_error == "Produk tidak ditemukan." || $pesan_error == "Jumlah beli melebihi ketersediaan stok terbaru.") {
             echo json_encode(['status' => 'error', 'message' => "Gagal Simpan! $pesan_error"]);
         } else {
-            // PERUBAHAN: Tampilkan error asli MySQL untuk melacak masalah
             echo json_encode(['status' => 'error', 'message' => "MySQL Error: " . $pesan_error]);
         }
         exit;
     }
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Permintaan tidak valid.']);
+    echo json_encode(['status' => 'error', 'message' => 'Permintaan tidak valid. Data form kosong atau terblokir.']);
     exit;
 }
