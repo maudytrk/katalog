@@ -77,6 +77,8 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
         /* TEMA WARNA BERDASARKAN PALETTE (warna.jpeg) */
@@ -269,6 +271,13 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
 
         .contact-link-email:hover {
             color: #D44638 !important;
+        }
+        
+        /* Custom SweetAlert Button Styling */
+        .swal2-confirm.swal2-styled {
+            border-radius: 20px !important;
+            font-weight: bold !important;
+            padding: 10px 24px !important;
         }
     </style>
 </head>
@@ -556,6 +565,9 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
     <?php include 'modal_logout.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -642,17 +654,39 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
                     .then(response => response.json())
                     .then(res => {
                         if (res.status === 'success') {
-                            alert(res.message);
-                            window.location.reload(); 
+                            // MENGGUNAKAN SWEETALERT2 UNTUK SUKSES
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: res.message,
+                                icon: 'success',
+                                confirmButtonText: 'Tutup',
+                                confirmButtonColor: 'var(--accent-olive)'
+                            }).then((result) => {
+                                window.location.reload(); 
+                            });
                         } else {
-                            alert('Gagal: ' + res.message);
+                            // MENGGUNAKAN SWEETALERT2 UNTUK ERROR DARI BACKEND
+                            Swal.fire({
+                                title: 'Gagal Memproses',
+                                text: res.message,
+                                icon: 'warning',
+                                confirmButtonText: 'Kembali',
+                                confirmButtonColor: '#dc3545'
+                            });
                             btnSubmit.innerHTML = originalText;
                             btnSubmit.disabled = false;
                         }
                     })
                     .catch(err => {
                         console.error("Fetch Error:", err);
-                        alert('Terjadi kesalahan pada server saat memproses pesanan.');
+                        // MENGGUNAKAN SWEETALERT2 UNTUK ERROR SISTEM/KONEKSI
+                        Swal.fire({
+                            title: 'Terjadi Kesalahan!',
+                            text: 'Sistem gagal menghubungi peladen saat memproses pesanan Anda.',
+                            icon: 'error',
+                            confirmButtonText: 'Tutup',
+                            confirmButtonColor: 'var(--tyrian-purple)'
+                        });
                         btnSubmit.innerHTML = originalText;
                         btnSubmit.disabled = false;
                     });
