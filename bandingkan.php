@@ -612,19 +612,12 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
                 });
             });
 
-            // --- PENANGANAN FORM TRANSAKSI CEPAT (Ubah form standar menjadi JSON) ---
+            // --- PENANGANAN FORM TRANSAKSI CEPAT ---
             const formsOrder = document.querySelectorAll('form[action="proses_order_cepat.php"]');
             
             formsOrder.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault(); // Mencegah reload halaman standar
-
-                    // Kumpulkan data form ke dalam objek JavaScript
-                    const formData = new FormData(this);
-                    const dataObj = {};
-                    formData.forEach((value, key) => {
-                        dataObj[key] = value;
-                    });
 
                     // Ubah tombol submit menjadi status loading agar tidak di-klik 2x
                     const btnSubmit = this.querySelector('button[type="submit"]');
@@ -632,19 +625,19 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
                     btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Memproses...';
                     btnSubmit.disabled = true;
 
-                    // Kirim data menggunakan Fetch API (Sesuai permintaan backend)
+                    // Menggunakan Format URLSearchParams agar sesuai standar PHP $_POST murni
+                    const dataPOST = new URLSearchParams(new FormData(this));
+
+                    // Kirim data menggunakan Fetch API
                     fetch('proses_order_cepat.php', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(dataObj)
+                        body: dataPOST // Tidak perlu menyetel Content-Type, browser otomatis melakukannya
                     })
                     .then(response => response.json())
                     .then(res => {
                         if (res.status === 'success') {
                             alert(res.message);
-                            window.location.reload(); // Reload halaman untuk mengupdate sisa stok di tabel
+                            window.location.reload(); 
                         } else {
                             alert('Gagal: ' + res.message);
                             btnSubmit.innerHTML = originalText;
