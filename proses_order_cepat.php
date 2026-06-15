@@ -17,29 +17,35 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// ==========================================
-// PENANGANAN MULTI-FORMAT REQUEST
-// ==========================================
-$contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
-$data = [];
+// =======================================================
+// PENANGANAN DATA SUPER AMAN (Menangkap dari Segala Sisi)
+// =======================================================
+$data = $_POST; // Langkah 1: Coba tangkap standar formulir HTML
 
-// Mengecek apakah request berformat JSON atau Form Standar
-if (strpos($contentType, 'application/json') !== false) {
-    $inputJSON = file_get_contents('php://input');
-    $data = json_decode($inputJSON, TRUE);
-} else {
-    $data = $_POST;
+// Langkah 2: Jika $_POST kosong (biasanya karena fetch JS atau diblokir server)
+$rawInput = file_get_contents('php://input');
+
+if (empty($data) && !empty($rawInput)) {
+    // Uji apakah data dikirim dalam bentuk JSON
+    $json_data = json_decode($rawInput, true);
+    
+    if (is_array($json_data)) {
+        $data = $json_data;
+    } else {
+        // Jika bukan JSON, paksa urai sebagai teks URL-encoded
+        parse_str($rawInput, $data);
+    }
 }
 
-// Lanjutkan pemrosesan jika ada data yang masuk
-if (!empty($data)) {
+// Pastikan data inti ('id_produk') benar-benar terbaca
+if (!empty($data) && isset($data['id_produk'])) {
 
     // AKTIFKAN REPORT EXCEPTION MYSQLI
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    // 2. Ambil data input 
+    // 2. Ambil data input dengan aman
     $id_user        = mysqli_real_escape_string($koneksi, $_SESSION['user_id']);
-    $id_produk      = isset($data['id_produk']) ? (int)$data['id_produk'] : 0;
+    $id_produk      = (int)$data['id_produk'];
     $harga_satuan   = isset($data['harga_satuan']) ? (float)$data['harga_satuan'] : 0;
     $nama_pelanggan = isset($data['nama_pelanggan']) ? mysqli_real_escape_string($koneksi, trim($data['nama_pelanggan'])) : '';
     $no_hp          = isset($data['no_hp']) ? mysqli_real_escape_string($koneksi, trim($data['no_hp'])) : '';
@@ -70,7 +76,7 @@ if (!empty($data)) {
         $stok_sekarang = (int)$data_produk['stok'];
 
         if ($jumlah_beli > $stok_sekarang) {
-            throw new Exception("Jumlah beli melebihi ketersediaan stok terbaru.");
+            throw new Exception("Jumlah beli ($jumlah_beli) melebihi ketersediaan stok terbaru di gudang ($stok_sekarang).");
         }
 
         // 5. Hitung Total Bayar
@@ -108,7 +114,7 @@ if (!empty($data)) {
         $koneksi->rollback();
         $pesan_error = $e->getMessage();
 
-        if ($pesan_error == "Produk tidak ditemukan." || $pesan_error == "Jumlah beli melebihi ketersediaan stok terbaru.") {
+        if (strpos($pesan_error, "melebihi ketersediaan stok") !== false || $pesan_error == "Produk tidak ditemukan.") {
             echo json_encode(['status' => 'error', 'message' => "Gagal Simpan! $pesan_error"]);
         } else {
             echo json_encode(['status' => 'error', 'message' => "MySQL Error: " . $pesan_error]);
@@ -116,6 +122,13 @@ if (!empty($data)) {
         exit;
     }
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Permintaan tidak valid. Data form kosong atau terblokir.']);
+    // Mode Debugging: Pesan ini akan memberikan petunjuk akurat KANAPA server gagal membaca.
+    $metode_request = $_SERVER['REQUEST_METHOD'] ?? 'TIDAK_DIKETAHUI';
+    $info_tambahan = "Metode: $metode_request | Panjang Payload: " . strlen($rawInput) . " bytes";
+    
+    echo json_encode([
+        'status' => 'error', 
+        'message' => "Permintaan ditolak. Server sama sekali tidak menerima isi data formulir Anda. ($info_tambahan)"
+    ]);
     exit;
 }

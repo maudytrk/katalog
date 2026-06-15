@@ -625,13 +625,19 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
                     btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Memproses...';
                     btnSubmit.disabled = true;
 
-                    // Menggunakan Format URLSearchParams agar sesuai standar PHP $_POST murni
-                    const dataPOST = new URLSearchParams(new FormData(this));
+                    // Mengambil data dari form
+                    const formData = new FormData(this);
+                    
+                    // Mengubah data form menjadi format query string (application/x-www-form-urlencoded)
+                    const urlEncodedData = new URLSearchParams(formData).toString();
 
-                    // Kirim data menggunakan Fetch API
+                    // Kirim data menggunakan Fetch API dengan header eksplisit
                     fetch('proses_order_cepat.php', {
                         method: 'POST',
-                        body: dataPOST // Tidak perlu menyetel Content-Type, browser otomatis melakukannya
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded' // Paksa tipe konten ini agar terbaca oleh PHP $_POST
+                        },
+                        body: urlEncodedData // Kirim data yang sudah diformat
                     })
                     .then(response => response.json())
                     .then(res => {
