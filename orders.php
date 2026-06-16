@@ -327,6 +327,7 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
                                         <th>Sales</th>
                                         <th>Total</th>
                                         <th class="text-center">Status Tracking</th>
+                                        <th class="text-center">Bukti Transfer</th>
                                         <th class="text-center" width="10%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -364,11 +365,50 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
                                                 </span>
                                             </td>
                                             <td class="text-center">
+                                                <?php if (!empty($row['bukti_transfer'])): ?>
+                                                    <button class="btn btn-sm text-white fw-bold shadow-sm" style="background-color: var(--accent-olive); border: none; font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalViewBukti<?php echo htmlspecialchars($row['id_order']); ?>">
+                                                        <i class="fas fa-image me-1"></i> Lihat Bukti
+                                                    </button>
+                                                <?php else: ?>
+                                                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-1.5 text-uppercase" style="font-size: 0.7rem; font-weight: 600;">
+                                                        <i class="fas fa-hourglass-start me-1"></i> Belum Ada
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-center">
                                                 <button class="btn btn-warning text-dark btn-sm fw-medium shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdate<?php echo htmlspecialchars($row['id_order']); ?>">
                                                     <i class="fas fa-edit me-1"></i> Update
                                                 </button>
                                             </td>
                                         </tr>
+
+                                        <!-- Modal Lihat Bukti Transfer -->
+                                        <?php if (!empty($row['bukti_transfer'])): ?>
+                                        <div class="modal fade" id="modalViewBukti<?php echo htmlspecialchars($row['id_order']); ?>" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content shadow-lg border-0" style="border-radius: 12px; overflow: hidden;">
+                                                    <div class="modal-header modal-header-custom">
+                                                        <h5 class="modal-title fw-bold"><i class="fas fa-receipt me-2 text-warning"></i> Bukti Transfer #<?php echo htmlspecialchars($row['id_order']); ?></h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body bg-white text-center p-4">
+                                                        <span class="d-block small text-muted mb-3">Pesanan oleh: <strong><?php echo htmlspecialchars($row['nama_pelanggan']); ?></strong></span>
+                                                        <div class="p-2 border rounded bg-light d-inline-block w-100">
+                                                            <img src="assets/img/bukti_transfer/<?php echo htmlspecialchars($row['bukti_transfer']); ?>" alt="Bukti Transfer" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;">
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <a href="assets/img/bukti_transfer/<?php echo htmlspecialchars($row['bukti_transfer']); ?>" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                                                <i class="fas fa-external-link-alt me-1"></i> Buka Gambar Penuh
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer bg-light p-2 border-0">
+                                                        <button type="button" class="btn btn-secondary btn-sm w-100 py-2 fw-bold" data-bs-dismiss="modal">Tutup</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
 
                                         <div class="modal fade" id="modalUpdate<?php echo htmlspecialchars($row['id_order']); ?>" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-sm modal-dialog-centered">

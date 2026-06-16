@@ -19,14 +19,12 @@ if (!$is_login || $user_role !== 'sales') {
 // Sesuaikan 'id_user' dengan nama kolom ID di tabel sales/user Anda
 $id_sales_aktif = $_SESSION['user_id'] ?? 0;
 
-// Query untuk mengambil riwayat order. Menggabungkan tabel orders dan order_detail serta produk
-// Menambahkan GROUP_CONCAT untuk mengambil nama produk
-$query_riwayat = "SELECT o.id_order, o.nama_pelanggan, o.tgl_pesan, o.total_bayar, o.status_order,
-                         IFNULL(SUM(od.jumlah), 0) as jumlah_item,
-                         GROUP_CONCAT(p.nama_produk SEPARATOR ', ') as nama_produk
+// Query untuk mengambil riwayat order. Menggabungkan tabel orders dan order_detail
+// Asumsi: tabel orders memiliki kolom (id_order, id_user, nama_pelanggan, tgl_pesan, total_bayar, status_order)
+$query_riwayat = "SELECT o.id_order, o.nama_pelanggan, o.tgl_pesan, o.total_bayar, o.status_order, o.bukti_transfer,
+                         IFNULL(SUM(od.jumlah), 0) as jumlah_item
                   FROM orders o
                   LEFT JOIN order_detail od ON o.id_order = od.id_order
-                  LEFT JOIN produk p ON od.id_produk = p.id_produk
                   WHERE o.id_user = '$id_sales_aktif'
                   GROUP BY o.id_order
                   ORDER BY o.tgl_pesan DESC";
@@ -44,11 +42,6 @@ $result_riwayat = $koneksi->query($query_riwayat);
     <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
         :root {
@@ -146,37 +139,6 @@ $result_riwayat = $koneksi->query($query_riwayat);
             background-color: var(--accent-gray);
             opacity: 0.3;
         }
-
-        /* Style untuk footer contact links */
-        .contact-link {
-            color: var(--bg-lavender);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .contact-link:hover {
-            transform: translateX(5px);
-        }
-
-        .contact-link-wa:hover {
-            color: #25D366 !important;
-        }
-
-        .contact-link-ig:hover {
-            color: #E4405F !important;
-        }
-
-        .contact-link-email:hover {
-            color: #D44638 !important;
-        }
-
-        /* Custom SweetAlert Button Styling */
-        .swal2-confirm.swal2-styled {
-            border-radius: 20px !important;
-            font-weight: bold !important;
-            padding: 10px 24px !important;
-        }
     </style>
 </head>
 
@@ -206,13 +168,13 @@ $result_riwayat = $koneksi->query($query_riwayat);
                     <thead>
                         <tr>
                             <th class="text-center" width="5%">No</th>
-                            <th width="10%">ID Order</th>
-                            <th width="15%">Tanggal Transaksi</th>
-                            <th width="15%">Nama Pelanggan</th>
-                            <th width="20%">Nama Produk</th>
+                            <th width="12%">ID Order</th>
+                            <th width="18%">Tanggal Transaksi</th>
+                            <th width="20%">Nama Pelanggan</th>
                             <th class="text-center" width="10%">Jumlah Item</th>
                             <th class="text-end" width="15%">Total Bayar</th>
                             <th class="text-center" width="10%">Status</th>
+                            <th class="text-center" width="10%">Bukti Transfer</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -242,9 +204,6 @@ $result_riwayat = $koneksi->query($query_riwayat);
                                     <td class="fw-semibold" style="color: var(--accent-indigo);">
                                         <?= htmlspecialchars($row['nama_pelanggan']); ?>
                                     </td>
-                                    <td class="small text-muted">
-                                        <?= htmlspecialchars($row['nama_produk'] ?? '-'); ?>
-                                    </td>
                                     <td class="text-center fw-bold text-secondary">
                                         <?= $row['jumlah_item']; ?> Pcs
                                     </td>
@@ -256,11 +215,26 @@ $result_riwayat = $koneksi->query($query_riwayat);
                                             <?= htmlspecialchars($status); ?>
                                         </span>
                                     </td>
+                                    <td class="text-center">
+                                        <?php if ($status == 'dibatalkan'): ?>
+                                            <span class="text-muted small">-</span>
+                                        <?php else: ?>
+                                            <?php if (empty($row['bukti_transfer'])): ?>
+                                                <button class="btn btn-sm btn-theme rounded-pill px-3 shadow-sm fw-bold" style="background-color: var(--accent-plum); font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id_order']; ?>">
+                                                    <i class="fas fa-upload me-1"></i> Upload
+                                                </button>
+                                            <?php else: ?>
+                                                <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id_order']; ?>">
+                                                    <i class="fas fa-image me-1"></i> Lihat Bukti
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="7" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-muted mb-3 opacity-50"></i>
                                     <h6 class="text-muted fw-bold">Belum ada transaksi yang Anda buat.</h6>
                                     <p class="small text-muted mb-0">Pesanan yang Anda input melalui fitur "Pesanan Cepat" di Katalog akan muncul di sini.</p>
@@ -279,26 +253,77 @@ $result_riwayat = $koneksi->query($query_riwayat);
 
         </div>
     </div>
+
+    <!-- Modal Bukti Transfer Section (Di luar card-glass agar tidak tertutup backdrop hitam) -->
+    <?php if ($result_riwayat && $result_riwayat->num_rows > 0): ?>
+        <?php 
+        $result_riwayat->data_seek(0); 
+        while ($row = $result_riwayat->fetch_assoc()):
+            $status = strtolower($row['status_order']);
+            if ($status != 'dibatalkan'):
+        ?>
+            <div class="modal fade" id="modalBukti<?= $row['id_order']; ?>" tabindex="-1" aria-labelledby="modalBuktiLabel<?= $row['id_order']; ?>" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+                        <div class="modal-header border-0 text-white" style="background: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-plum) 100%);">
+                            <h5 class="modal-title fw-bold" id="modalBuktiLabel<?= $row['id_order']; ?>">
+                                <i class="fas fa-receipt text-warning me-2"></i>Bukti Transfer #<?= htmlspecialchars($row['id_order']); ?>
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="proses_upload_bukti.php" method="POST" enctype="multipart/form-data">
+                            <div class="modal-body p-4 bg-white text-dark">
+                                <input type="hidden" name="id_order" value="<?= htmlspecialchars($row['id_order']); ?>">
+                                
+                                <?php if (!empty($row['bukti_transfer'])): ?>
+                                    <div class="text-center mb-3">
+                                        <span class="d-block small text-muted mb-2">Bukti Transfer Saat Ini:</span>
+                                        <div class="p-2 border rounded-3 bg-light d-inline-block">
+                                            <img src="assets/img/bukti_transfer/<?= htmlspecialchars($row['bukti_transfer']); ?>" alt="Bukti Transfer" class="img-fluid rounded shadow-sm" style="max-height: 250px; object-fit: contain;">
+                                        </div>
+                                    </div>
+                                    <hr class="my-3 opacity-25">
+                                <?php endif; ?>
+
+                                <div class="mb-3 text-start">
+                                    <label class="form-label fw-bold text-dark mb-1">
+                                        <?= !empty($row['bukti_transfer']) ? 'Unggah / Ganti Bukti Transfer Baru' : 'Unggah Bukti Transfer' ?>
+                                    </label>
+                                    <input type="file" name="bukti_transfer" class="form-control border-secondary-subtle" accept="image/*" required>
+                                    <div class="form-text small text-muted mt-2">
+                                        <i class="fas fa-info-circle me-1"></i> Format yang diperbolehkan: <strong>PNG, JPG, JPEG, WEBP</strong>. Maksimal <strong>5MB</strong>.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light p-3 border-0 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-theme rounded-pill px-4">
+                                    <i class="fas fa-paper-plane me-1"></i> Unggah Bukti
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php 
+            endif;
+        endwhile; 
+        ?>
+    <?php endif; ?>
+
     <footer class="py-5">
         <div class="container">
             <div class="row">
                 <div id="about" class="col-md-6 mb-4 mb-md-0">
                     <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
                 </div>
                 <div id="contact" class="col-md-6 text-md-end">
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
                         <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
-                            <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
-                        </a><br>
-                        <a href="https://www.instagram.com/rahayuofficialstore.id" target="_blank" class="contact-link contact-link-ig">
-                            <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore.id
-                        </a><br>
-                        <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
-                            <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
-                        </a><br>
+                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
+                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
                     </p>
                 </div>
             </div>
@@ -309,6 +334,8 @@ $result_riwayat = $koneksi->query($query_riwayat);
 
 
     <div style="height: 50px;"></div>
+
+    <?php include 'modal_notifikasi.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
