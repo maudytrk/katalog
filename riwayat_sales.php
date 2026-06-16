@@ -19,12 +19,14 @@ if (!$is_login || $user_role !== 'sales') {
 // Sesuaikan 'id_user' dengan nama kolom ID di tabel sales/user Anda
 $id_sales_aktif = $_SESSION['user_id'] ?? 0;
 
-// Query untuk mengambil riwayat order. Menggabungkan tabel orders dan order_detail
-// Asumsi: tabel orders memiliki kolom (id_order, id_user, nama_pelanggan, tgl_pesan, total_bayar, status_order)
+// Query untuk mengambil riwayat order. Menggabungkan tabel orders dan order_detail serta produk
+// Menambahkan GROUP_CONCAT untuk mengambil nama produk
 $query_riwayat = "SELECT o.id_order, o.nama_pelanggan, o.tgl_pesan, o.total_bayar, o.status_order,
-                         IFNULL(SUM(od.jumlah), 0) as jumlah_item
+                         IFNULL(SUM(od.jumlah), 0) as jumlah_item,
+                         GROUP_CONCAT(p.nama_produk SEPARATOR ', ') as nama_produk
                   FROM orders o
                   LEFT JOIN order_detail od ON o.id_order = od.id_order
+                  LEFT JOIN produk p ON od.id_produk = p.id_produk
                   WHERE o.id_user = '$id_sales_aktif'
                   GROUP BY o.id_order
                   ORDER BY o.tgl_pesan DESC";
@@ -42,6 +44,11 @@ $result_riwayat = $koneksi->query($query_riwayat);
     <?php include 'pwa_meta.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
         :root {
@@ -139,6 +146,37 @@ $result_riwayat = $koneksi->query($query_riwayat);
             background-color: var(--accent-gray);
             opacity: 0.3;
         }
+
+        /* Style untuk footer contact links */
+        .contact-link {
+            color: var(--bg-lavender);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-link:hover {
+            transform: translateX(5px);
+        }
+
+        .contact-link-wa:hover {
+            color: #25D366 !important;
+        }
+
+        .contact-link-ig:hover {
+            color: #E4405F !important;
+        }
+
+        .contact-link-email:hover {
+            color: #D44638 !important;
+        }
+
+        /* Custom SweetAlert Button Styling */
+        .swal2-confirm.swal2-styled {
+            border-radius: 20px !important;
+            font-weight: bold !important;
+            padding: 10px 24px !important;
+        }
     </style>
 </head>
 
@@ -168,9 +206,10 @@ $result_riwayat = $koneksi->query($query_riwayat);
                     <thead>
                         <tr>
                             <th class="text-center" width="5%">No</th>
-                            <th width="15%">ID Order</th>
-                            <th width="20%">Tanggal Transaksi</th>
-                            <th width="25%">Nama Pelanggan</th>
+                            <th width="10%">ID Order</th>
+                            <th width="15%">Tanggal Transaksi</th>
+                            <th width="15%">Nama Pelanggan</th>
+                            <th width="20%">Nama Produk</th>
                             <th class="text-center" width="10%">Jumlah Item</th>
                             <th class="text-end" width="15%">Total Bayar</th>
                             <th class="text-center" width="10%">Status</th>
@@ -203,6 +242,9 @@ $result_riwayat = $koneksi->query($query_riwayat);
                                     <td class="fw-semibold" style="color: var(--accent-indigo);">
                                         <?= htmlspecialchars($row['nama_pelanggan']); ?>
                                     </td>
+                                    <td class="small text-muted">
+                                        <?= htmlspecialchars($row['nama_produk'] ?? '-'); ?>
+                                    </td>
                                     <td class="text-center fw-bold text-secondary">
                                         <?= $row['jumlah_item']; ?> Pcs
                                     </td>
@@ -218,7 +260,7 @@ $result_riwayat = $koneksi->query($query_riwayat);
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-muted mb-3 opacity-50"></i>
                                     <h6 class="text-muted fw-bold">Belum ada transaksi yang Anda buat.</h6>
                                     <p class="small text-muted mb-0">Pesanan yang Anda input melalui fitur "Pesanan Cepat" di Katalog akan muncul di sini.</p>
@@ -242,14 +284,21 @@ $result_riwayat = $koneksi->query($query_riwayat);
             <div class="row">
                 <div id="about" class="col-md-6 mb-4 mb-md-0">
                     <h5 class="fw-bold mb-3 text-white"><i class="bi bi-shop me-2" style="color: var(--accent-gray);"></i>PT Rahayu Karunia Utama</h5>
-                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami sejak tahun 2011. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
+                    <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">Produsen perlengkapan inner wanita berkualitas yang mengedepankan kenyamanan dan estetika bagi setiap pelanggan kami. Karya terbaik dari penjahit lokal untuk menemani hari-hari Anda.</p>
                 </div>
                 <div id="contact" class="col-md-6 text-md-end">
                     <h5 class="fw-bold mb-3 text-white">Hubungi Kami</h5>
                     <p class="small" style="line-height: 1.8; color: var(--bg-lavender);">
                         <i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-gray);"></i>Kota Depok<br>
-                        <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>info@rahayu.com<br>
-                        <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 812-3456-7890
+                        <a href="https://wa.me/6289696611750" target="_blank" class="contact-link contact-link-wa">
+                            <i class="bi bi-whatsapp me-2" style="color: var(--accent-gray);"></i>+62 896-9661-1750
+                        </a><br>
+                        <a href="https://www.instagram.com/rahayuofficialstore.id" target="_blank" class="contact-link contact-link-ig">
+                            <i class="bi bi-instagram me-2" style="color: var(--accent-gray);"></i>rahayuofficialstore.id
+                        </a><br>
+                        <a href="mailto:Rahayuofficialstore.id@gmail.com" class="contact-link contact-link-email">
+                            <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gray);"></i>Rahayuofficialstore.id@gmail.com
+                        </a><br>
                     </p>
                 </div>
             </div>
