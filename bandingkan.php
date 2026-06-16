@@ -77,7 +77,7 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
@@ -272,7 +272,7 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
         .contact-link-email:hover {
             color: #D44638 !important;
         }
-        
+
         /* Custom SweetAlert Button Styling */
         .swal2-confirm.swal2-styled {
             border-radius: 20px !important;
@@ -565,7 +565,7 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
     <?php include 'modal_logout.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -626,7 +626,7 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
 
             // --- PENANGANAN FORM TRANSAKSI CEPAT ---
             const formsOrder = document.querySelectorAll('form[action="proses_order_cepat.php"]');
-            
+
             formsOrder.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault(); // Mencegah reload halaman standar
@@ -639,126 +639,61 @@ $result_all = $koneksi->query("SELECT id_produk, nama_produk FROM produk ORDER B
 
                     // Mengambil data dari form
                     const formData = new FormData(this);
-                    
+
                     // Mengubah data form menjadi format query string (application/x-www-form-urlencoded)
                     const urlEncodedData = new URLSearchParams(formData).toString();
 
                     // Kirim data menggunakan Fetch API dengan header eksplisit
                     fetch('proses_order_cepat.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded' // Paksa tipe konten ini agar terbaca oleh PHP $_POST
-                        },
-                        body: urlEncodedData // Kirim data yang sudah diformat
-                    })
-                    .then(response => response.json())
-                    .then(res => {
-                        if (res.status === 'success') {
-                            // MENGGUNAKAN SWEETALERT2 UNTUK SUKSES
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded' // Paksa tipe konten ini agar terbaca oleh PHP $_POST
+                            },
+                            body: urlEncodedData // Kirim data yang sudah diformat
+                        })
+                        .then(response => response.json())
+                        .then(res => {
+                            if (res.status === 'success') {
+                                // MENGGUNAKAN SWEETALERT2 UNTUK SUKSES
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: res.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'Tutup',
+                                    confirmButtonColor: 'var(--accent-olive)'
+                                }).then((result) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                // MENGGUNAKAN SWEETALERT2 UNTUK ERROR DARI BACKEND
+                                Swal.fire({
+                                    title: 'Gagal Memproses',
+                                    text: res.message,
+                                    icon: 'warning',
+                                    confirmButtonText: 'Kembali',
+                                    confirmButtonColor: '#dc3545'
+                                });
+                                btnSubmit.innerHTML = originalText;
+                                btnSubmit.disabled = false;
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Fetch Error:", err);
+                            // MENGGUNAKAN SWEETALERT2 UNTUK ERROR SISTEM/KONEKSI
                             Swal.fire({
-                                title: 'Berhasil!',
-                                text: res.message,
-                                icon: 'success',
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Sistem gagal menghubungi peladen saat memproses pesanan Anda.',
+                                icon: 'error',
                                 confirmButtonText: 'Tutup',
-                                confirmButtonColor: 'var(--accent-olive)'
-                            }).then((result) => {
-                                window.location.reload(); 
-                            });
-                        } else {
-                            // MENGGUNAKAN SWEETALERT2 UNTUK ERROR DARI BACKEND
-                            Swal.fire({
-                                title: 'Gagal Memproses',
-                                text: res.message,
-                                icon: 'warning',
-                                confirmButtonText: 'Kembali',
-                                confirmButtonColor: '#dc3545'
+                                confirmButtonColor: 'var(--tyrian-purple)'
                             });
                             btnSubmit.innerHTML = originalText;
                             btnSubmit.disabled = false;
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Fetch Error:", err);
-                        // MENGGUNAKAN SWEETALERT2 UNTUK ERROR SISTEM/KONEKSI
-                        Swal.fire({
-                            title: 'Terjadi Kesalahan!',
-                            text: 'Sistem gagal menghubungi peladen saat memproses pesanan Anda.',
-                            icon: 'error',
-                            confirmButtonText: 'Tutup',
-                            confirmButtonColor: 'var(--tyrian-purple)'
                         });
-                        btnSubmit.innerHTML = originalText;
-                        btnSubmit.disabled = false;
-                    });
                 });
             });
 
         });
-    </script>
-
-    <div id="tabelPerbandingan" class="table-responsive">
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let listBanding = JSON.parse(localStorage.getItem("listBanding")) || [];
-            // Log 1: Memeriksa isi data asli di memori peramban
-            console.log("ID Produk di localStorage:", listBanding);
-
-            if (listBanding.length > 0) {
-                fetch('get_produk_banding.php', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            ids: listBanding
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(res => {
-                        // Log 2: Memeriksa respon balik dari sistem PHP
-                        console.log("Respon penuh dari server:", res);
-
-                        if (res.status === 'success' && res.products.length > 0) {
-                            let data = res.products;
-                            let html = '<table class="table table-bordered text-center">';
-
-                            // Baris Nama Produk
-                            html += '<tr><th class="bg-light" style="width: 200px;">Nama Produk</th>';
-                            data.forEach(produk => {
-                                html += `<td><strong>${produk.nama_produk}</strong></td>`;
-                            });
-                            html += '</tr>';
-
-                            // Baris Harga
-                            html += '<tr><th class="bg-light">Harga</th>';
-                            data.forEach(produk => {
-                                html += `<td>${produk.harga_format}</td>`;
-                            });
-                            html += '</tr>';
-
-                            html += '</table>';
-                            html += '<button class="btn btn-danger btn-sm mt-2" onclick="hapusBanding()">Kosongkan Perbandingan</button>';
-
-                            document.getElementById('tabelPerbandingan').innerHTML = html;
-                        } else {
-                            document.getElementById('tabelPerbandingan').innerHTML = "<p class='alert alert-warning'>Data produk tidak ditemukan di pangkalan data peladen pusat.</p>";
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Fetch Error:", err);
-                        document.getElementById('tabelPerbandingan').innerHTML = "<p class='alert alert-danger'>Terjadi kesalahan koneksi sistem.</p>";
-                    });
-            } else {
-                document.getElementById('tabelPerbandingan').innerHTML = "<p class='text-muted'>Belum ada produk yang dipilih untuk dibandingkan.</p>";
-            }
-        });
-
-        function hapusBanding() {
-            localStorage.removeItem("listBanding");
-            window.location.reload();
-        }
     </script>
 </body>
 
