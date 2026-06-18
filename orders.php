@@ -13,6 +13,17 @@ if (isset($_POST['update_status'])) {
     $id_order = mysqli_real_escape_string($koneksi, $_POST['id_order']);
     $status_baru = mysqli_real_escape_string($koneksi, $_POST['status_order']);
 
+    // Validasi apakah sales sudah mengirim bukti transaksi
+    $query_cek_bukti = $koneksi->query("SELECT bukti_transfer FROM orders WHERE id_order = '$id_order'");
+    if ($query_cek_bukti && $query_cek_bukti->num_rows > 0) {
+        $order_data = $query_cek_bukti->fetch_assoc();
+        if (empty($order_data['bukti_transfer'])) {
+            $_SESSION['gagal'] = "Gagal memperbarui status: Bukti transaksi belum dikirim atau telah ditolak oleh Admin!";
+            header("Location: orders.php");
+            exit;
+        }
+    }
+
     // Pastikan nama kolom di database Anda adalah status_order
     $update = $koneksi->query("UPDATE orders SET status_order = '$status_baru' WHERE id_order = '$id_order'");
     if ($update) {
@@ -21,6 +32,34 @@ if (isset($_POST['update_status'])) {
         exit;
     } else {
         $_SESSION['gagal'] = "Gagal memperbarui status: " . $koneksi->error;
+        header("Location: orders.php");
+        exit;
+    }
+}
+
+// Logika Tolak Bukti Transfer (Minta Upload Ulang)
+if (isset($_POST['tolak_bukti'])) {
+    $id_order = mysqli_real_escape_string($koneksi, $_POST['id_order']);
+    $alasan_tolak = mysqli_real_escape_string($koneksi, $_POST['alasan_tolak']);
+
+    // Ambil info bukti transfer lama untuk dihapus filenya
+    $query_cek = $koneksi->query("SELECT bukti_transfer FROM orders WHERE id_order = '$id_order'");
+    if ($query_cek && $query_cek->num_rows > 0) {
+        $order_data = $query_cek->fetch_assoc();
+        $bukti_lama = $order_data['bukti_transfer'];
+        $target_dir = 'assets/img/bukti_transfer/';
+        if (!empty($bukti_lama) && file_exists($target_dir . $bukti_lama)) {
+            unlink($target_dir . $bukti_lama);
+        }
+    }
+
+    $update = $koneksi->query("UPDATE orders SET bukti_transfer = NULL, catatan_bukti = '$alasan_tolak' WHERE id_order = '$id_order'");
+    if ($update) {
+        $_SESSION['sukses'] = "Bukti transfer pesanan #$id_order berhasil ditolak. Sales diminta mengunggah ulang.";
+        header("Location: orders.php");
+        exit;
+    } else {
+        $_SESSION['gagal'] = "Gagal menolak bukti transfer: " . $koneksi->error;
         header("Location: orders.php");
         exit;
     }
@@ -327,7 +366,7 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
                                         <th>Sales</th>
                                         <th>Total</th>
                                         <th class="text-center">Status Tracking</th>
-                                        <th class="text-center">Bukti Transfer</th>
+                                        <th class="text-center">Bukti Transaksi</th>
                                         <th class="text-center" width="10%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -376,39 +415,59 @@ $filter = isset($_GET['filter_status']) ? mysqli_real_escape_string($koneksi, $_
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <button class="btn btn-warning text-dark btn-sm fw-medium shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdate<?php echo htmlspecialchars($row['id_order']); ?>">
-                                                    <i class="fas fa-edit me-1"></i> Update
-                                                </button>
+                                                <?php if (empty($row['bukti_transfer'])): ?>
+                                                    <button class="btn btn-warning text-dark btn-sm fw-medium shadow-sm" disabled style="opacity: 0.65; cursor: not-allowed;" title="Sales belum mengirim bukti transaksi atau bukti ditolak">
+                                                        <i class="fas fa-edit me-1"></i> Update
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="btn btn-warning text-dark btn-sm fw-medium shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdate<?php echo htmlspecialchars($row['id_order']); ?>">
+                                                        <i class="fas fa-edit me-1"></i> Update
+                                                    </button>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
 
                                         <!-- Modal Lihat Bukti Transfer -->
                                         <?php if (!empty($row['bukti_transfer'])): ?>
-                                        <div class="modal fade" id="modalViewBukti<?php echo htmlspecialchars($row['id_order']); ?>" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content shadow-lg border-0" style="border-radius: 12px; overflow: hidden;">
-                                                    <div class="modal-header modal-header-custom">
-                                                        <h5 class="modal-title fw-bold"><i class="fas fa-receipt me-2 text-warning"></i> Bukti Transfer #<?php echo htmlspecialchars($row['id_order']); ?></h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body bg-white text-center p-4">
-                                                        <span class="d-block small text-muted mb-3">Pesanan oleh: <strong><?php echo htmlspecialchars($row['nama_pelanggan']); ?></strong></span>
-                                                        <div class="p-2 border rounded bg-light d-inline-block w-100">
-                                                            <img src="assets/img/bukti_transfer/<?php echo htmlspecialchars($row['bukti_transfer']); ?>" alt="Bukti Transfer" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;">
+                                            <div class="modal fade" id="modalViewBukti<?php echo htmlspecialchars($row['id_order']); ?>" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content shadow-lg border-0" style="border-radius: 12px; overflow: hidden;">
+                                                        <div class="modal-header modal-header-custom">
+                                                            <h5 class="modal-title fw-bold"><i class="fas fa-receipt me-2 text-warning"></i> Bukti Transfer #<?php echo htmlspecialchars($row['id_order']); ?></h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
-                                                        <div class="mt-3">
-                                                            <a href="assets/img/bukti_transfer/<?php echo htmlspecialchars($row['bukti_transfer']); ?>" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                                                                <i class="fas fa-external-link-alt me-1"></i> Buka Gambar Penuh
-                                                            </a>
+                                                        <div class="modal-body bg-white text-center p-4">
+                                                            <span class="d-block small text-muted mb-3">Pesanan oleh: <strong><?php echo htmlspecialchars($row['nama_pelanggan']); ?></strong></span>
+                                                            <div class="p-2 border rounded bg-light d-inline-block w-100">
+                                                                <img src="assets/img/bukti_transfer/<?php echo htmlspecialchars($row['bukti_transfer']); ?>" alt="Bukti Transfer" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;">
+                                                            </div>
+                                                            <div class="mt-3">
+                                                                <a href="assets/img/bukti_transfer/<?php echo htmlspecialchars($row['bukti_transfer']); ?>" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                                                    <i class="fas fa-external-link-alt me-1"></i> Buka Gambar Penuh
+                                                                </a>
+                                                            </div>
+                                                            <hr class="my-3 opacity-25">
+                                                            <form method="POST" action="orders.php" class="text-start mt-3 p-3 bg-light rounded border">
+                                                                <input type="hidden" name="id_order" value="<?php echo htmlspecialchars($row['id_order']); ?>">
+                                                                <div class="mb-3">
+                                                                    <label for="alasan_tolak_<?php echo htmlspecialchars($row['id_order']); ?>" class="form-label fw-bold text-dark small mb-1">
+                                                                        <i class="fas fa-comment-dots text-danger me-1"></i> Alasan Bukti Tidak Sesuai:
+                                                                    </label>
+                                                                    <textarea name="alasan_tolak" id="alasan_tolak_<?php echo htmlspecialchars($row['id_order']); ?>" class="form-control form-control-sm border-secondary-subtle" rows="2" placeholder="Tulis alasan penolakan... (contoh: Gambar buram / nominal salah)" required></textarea>
+                                                                </div>
+                                                                <button type="submit" name="tolak_bukti" class="btn btn-danger btn-sm fw-bold w-100 py-2 shadow-sm">
+                                                                    <i class="fas fa-times-circle me-1"></i> Tolak Bukti & Minta Upload Ulang
+                                                                </button>
+                                                            </form>
                                                         </div>
-                                                    </div>
-                                                    <div class="modal-footer bg-light p-2 border-0">
-                                                        <button type="button" class="btn btn-secondary btn-sm w-100 py-2 fw-bold" data-bs-dismiss="modal">Tutup</button>
+                                                        <div class="modal-footer bg-light p-2 border-0">
+                                                            <button type="button" class="btn btn-secondary btn-sm w-100 py-2 fw-bold" data-bs-dismiss="modal">Tutup</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         <?php endif; ?>
+
 
                                         <div class="modal fade" id="modalUpdate<?php echo htmlspecialchars($row['id_order']); ?>" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-sm modal-dialog-centered">

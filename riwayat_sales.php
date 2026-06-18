@@ -20,7 +20,7 @@ if (!$is_login || $user_role !== 'sales') {
 $id_sales_aktif = $_SESSION['user_id'] ?? 0;
 
 // Query untuk mengambil riwayat order. Menggabungkan tabel orders, order_detail, dan produk
-$query_riwayat = "SELECT o.id_order, o.nama_pelanggan, o.tgl_pesan, o.total_bayar, o.status_order, o.bukti_transfer,
+$query_riwayat = "SELECT o.id_order, o.nama_pelanggan, o.tgl_pesan, o.total_bayar, o.status_order, o.bukti_transfer, o.catatan_bukti,
                          IFNULL(SUM(od.jumlah), 0) as jumlah_item,
                          GROUP_CONCAT(p.nama_produk SEPARATOR ', ') as nama_produk_list
                   FROM orders o
@@ -261,9 +261,18 @@ $result_riwayat = $koneksi->query($query_riwayat);
                                             <span class="text-muted small">-</span>
                                         <?php else: ?>
                                             <?php if (empty($row['bukti_transfer'])): ?>
-                                                <button class="btn btn-sm btn-theme rounded-pill px-3 shadow-sm fw-bold" style="background-color: var(--accent-plum); font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id_order']; ?>">
-                                                    <i class="fas fa-upload me-1"></i> Upload
-                                                </button>
+                                                <?php if (!empty($row['catatan_bukti'])): ?>
+                                                    <button class="btn btn-sm btn-danger rounded-pill px-3 shadow-sm fw-bold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id_order']; ?>">
+                                                        <i class="fas fa-redo me-1"></i> Upload Ulang
+                                                    </button>
+                                                    <div class="text-danger small mt-1 fw-semibold" style="font-size: 0.65rem;" title="<?= htmlspecialchars($row['catatan_bukti']); ?>">
+                                                        <i class="fas fa-exclamation-circle me-1"></i> Bukti Ditolak
+                                                    </div>
+                                                <?php else: ?>
+                                                    <button class="btn btn-sm btn-theme rounded-pill px-3 shadow-sm fw-bold" style="background-color: var(--accent-plum); font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id_order']; ?>">
+                                                        <i class="fas fa-upload me-1"></i> Upload
+                                                    </button>
+                                                <?php endif; ?>
                                             <?php else: ?>
                                                 <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id_order']; ?>">
                                                     <i class="fas fa-image me-1"></i> Lihat Bukti
@@ -314,6 +323,16 @@ $result_riwayat = $koneksi->query($query_riwayat);
                             <form action="proses_upload_bukti.php" method="POST" enctype="multipart/form-data">
                                 <div class="modal-body p-4 bg-white text-dark">
                                     <input type="hidden" name="id_order" value="<?= htmlspecialchars($row['id_order']); ?>">
+
+                                    <?php if (empty($row['bukti_transfer']) && !empty($row['catatan_bukti'])): ?>
+                                        <div class="alert alert-danger d-flex align-items-start gap-2 shadow-sm border-0 mb-3" role="alert" style="border-radius: 10px; background-color: #fde8e8; color: #9b1c1c;">
+                                            <i class="fas fa-exclamation-triangle mt-1"></i>
+                                            <div>
+                                                <strong class="d-block mb-1 small">Bukti Transfer Ditolak & Minta Upload Ulang:</strong>
+                                                <span class="small" style="font-size: 0.8rem;"><?= htmlspecialchars($row['catatan_bukti']); ?></span>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
 
                                     <?php if (!empty($row['bukti_transfer'])): ?>
                                         <div class="text-center mb-3">

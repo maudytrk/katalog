@@ -12,7 +12,7 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'sales') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 2. Ambil parameter input
     $id_order = mysqli_real_escape_string($koneksi, $_POST['id_order'] ?? '');
-    
+
     if (empty($id_order)) {
         $_SESSION['gagal'] = "Gagal: ID Order tidak valid atau tidak disertakan.";
         header("Location: riwayat_sales.php");
@@ -77,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (move_uploaded_file($tmp_name, $target_dir . $nama_foto_baru)) {
-            // Update nama file bukti transfer di database
-            $update = $koneksi->query("UPDATE orders SET bukti_transfer = '$nama_foto_baru' WHERE id_order = '$id_order'");
+            // Update nama file bukti transfer di database dan hapus catatan penolakan bukti jika ada
+            $update = $koneksi->query("UPDATE orders SET bukti_transfer = '$nama_foto_baru', catatan_bukti = NULL WHERE id_order = '$id_order'");
 
             if ($update) {
                 // Hapus file bukti transfer lama dari server jika ada untuk efisiensi ruang
@@ -112,4 +112,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 header("Location: riwayat_sales.php");
 exit;
-?>
