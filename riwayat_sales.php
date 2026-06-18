@@ -202,7 +202,7 @@ $result_riwayat = $koneksi->query($query_riwayat);
 
             <div class="table-responsive">
                 <table class="table table-custom table-hover mb-0">
-                    <thead>
+                    <thead class="align-middle">
                         <tr>
                             <th class="text-center" width="5%">No</th>
                             <th width="12%">ID Order</th>
@@ -215,9 +215,10 @@ $result_riwayat = $koneksi->query($query_riwayat);
                             <th class="text-center" width="8%">Bukti Transfer</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="align-middle">
                         <?php if ($result_riwayat && $result_riwayat->num_rows > 0): ?>
-                            <?php $no = 1;
+                            <?php
+                            $no = 1;
                             while ($row = $result_riwayat->fetch_assoc()):
 
                                 // Tentukan warna badge berdasarkan status
@@ -302,7 +303,7 @@ $result_riwayat = $koneksi->query($query_riwayat);
             <?php endif; ?>
 
         </div>
-    </div>
+    </div>S
 
     <?php if ($result_riwayat && $result_riwayat->num_rows > 0): ?>
         <?php
